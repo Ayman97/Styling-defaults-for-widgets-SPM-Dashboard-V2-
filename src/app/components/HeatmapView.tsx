@@ -33,7 +33,7 @@ const Y_TITLE   = true;
 const Y_LINE    = false;
 const Y_LABELS  = true;
 const Y_BOLD    = false;
-const Y_COLOR   = '#334155';
+const Y_COLOR   = '#6B7280';
 const Y_SIZE    = 14;
 const Y_ROTATE  = 0;
 
@@ -42,7 +42,7 @@ const X_TITLE   = true;
 const X_LINE    = false;
 const X_LABELS  = true;
 const X_BOLD    = false;
-const X_COLOR   = '#334155';
+const X_COLOR   = '#6B7280';
 const X_SIZE    = 14;
 const X_ROTATE  = 0;
 
@@ -142,7 +142,12 @@ function getOption(): echarts.EChartsCoreOption {
     backgroundColor: '#FFFFFF',
     animation: false,
     tooltip: {
-      formatter: (p: any) => {
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: [8, 12],
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
+            formatter: (p: any) => {
         const [xi, yi, val] = p.data as [number, number, number];
         return `<span style="font-family:${FONT}"><b>${REGIONS[yi]}</b><br/>${PORTFOLIOS[xi]}: <b>${fmtK(val)}</b></span>`;
       },
@@ -361,12 +366,13 @@ function StylePanel() {
             ['Used palette',   USED_PALETTE],
             ['Font family',    LABEL_FONT],
             ['Bold',           LABEL_BOLD ? 'Yes' : 'No'],
-            ['Text color',     LABEL_COLOR],
-            ['Text size',      `${LABEL_SIZE}`],
+            ['Color',          LABEL_COLOR],
+            ['Size',           `${LABEL_SIZE}`],
             ['Border style',   BORDER_STYLE],
             ['Border color',   BORDER_COLOR],
             ['Border width',   `${BORDER_WIDTH}`],
             ['Corners',        `${CORNERS}`],
+            ['Customize each row/column', 'No'],
           ]}
         />
       </div>
@@ -398,7 +404,7 @@ function StylePanel() {
             ['Show axis line',   Y_LINE    ? 'Yes' : 'No'],
             ['Show axis labels', Y_LABELS  ? 'Yes' : 'No'],
             ['Font family',      'Auto'],
-            ['Text bold',        Y_BOLD    ? 'Yes' : 'No'],
+            ['Bold',             Y_BOLD    ? 'Yes' : 'No'],
             ['Color',            Y_COLOR],
             ['Size',             `${Y_SIZE}`],
             ['Rotation',         `${Y_ROTATE}°`],
@@ -412,7 +418,7 @@ function StylePanel() {
             ['Show axis line',   X_LINE    ? 'Yes' : 'No'],
             ['Show axis labels', X_LABELS  ? 'Yes' : 'No'],
             ['Font family',      'Auto'],
-            ['Text bold',        X_BOLD    ? 'Yes' : 'No'],
+            ['Bold',             X_BOLD    ? 'Yes' : 'No'],
             ['Color',            X_COLOR],
             ['Size',             `${X_SIZE}`],
             ['Rotation',         `${X_ROTATE}°`],

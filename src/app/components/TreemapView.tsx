@@ -19,6 +19,7 @@ const GAP_OUTER       = 4;
 const GAP_INNER       = 2;
 const SQUARE_COLOR    = '#0B3A67';
 const SQUARE_OPACITY  = 100;
+const SQUARE_CORNERS  = 4;
 
 // Monochrome palette — 10 shades from dark to light, same system-wide palette
 const MONO = [
@@ -131,7 +132,12 @@ const DATA_2L = CATS.map(cat => ({
 function getCategoryOption(): echarts.EChartsCoreOption {
   return {
     tooltip: {
-      formatter: (p: any) => `<b>${p.name}</b><br/>Budget: ${fmt(p.value)}`,
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: [8, 12],
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
+            formatter: (p: any) => `<b>${p.name}</b><br/>Budget: ${fmt(p.value)}`,
       textStyle: { fontFamily: FONT, fontSize: 14 },
     },
     series: [{
@@ -155,7 +161,7 @@ function getCategoryOption(): echarts.EChartsCoreOption {
         lineHeight:    18,
         formatter:     (p: any) => `${p.name}\n${fmt(p.value)}`,
       },
-      itemStyle: { borderWidth: 0, gapWidth: 0 },
+      itemStyle: { borderWidth: 0, gapWidth: 0, opacity: SQUARE_OPACITY / 100 },
       levels: [
         {
           // depth-0: virtual root — gapWidth here = gap between category tiles
@@ -164,7 +170,7 @@ function getCategoryOption(): echarts.EChartsCoreOption {
         },
         {
           // depth-1: category tiles (flat — no children)
-          itemStyle: { borderWidth: 0, gapWidth: 0 },
+          itemStyle: { borderWidth: 0, gapWidth: 0, borderRadius: SQUARE_CORNERS },
         },
       ],
       emphasis: {
@@ -178,7 +184,12 @@ function getCategoryOption(): echarts.EChartsCoreOption {
 function getSubCatOption(): echarts.EChartsCoreOption {
   return {
     tooltip: {
-      formatter: (p: any) => {
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: [8, 12],
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
+            formatter: (p: any) => {
         const path = (p.treePathInfo || []).map((n: any) => n.name).slice(1).join(' › ');
         return `<b>${path || p.name}</b><br/>Budget: ${fmt(p.value)}`;
       },
@@ -207,7 +218,7 @@ function getSubCatOption(): echarts.EChartsCoreOption {
         overflow:      'truncate' as const,
       },
       upperLabel: { show: false },
-      itemStyle: { borderWidth: 0, gapWidth: 0 },
+      itemStyle: { borderWidth: 0, gapWidth: 0, opacity: SQUARE_OPACITY / 100 },
       levels: [
         {
           // depth-0: virtual root — gapWidth here = gap between category groups
@@ -221,7 +232,7 @@ function getSubCatOption(): echarts.EChartsCoreOption {
         },
         {
           // depth-2: leaf tiles
-          itemStyle: { borderWidth: 0, gapWidth: 0 },
+          itemStyle: { borderWidth: 0, gapWidth: 0, borderRadius: SQUARE_CORNERS },
         },
       ],
       emphasis: {
@@ -298,10 +309,12 @@ function StylePanel() {
         </h3>
         <h4 className="text-sm font-semibold mb-2 mt-3">Squares</h4>
         <StyleTable rows={[
-          ['Category spacing', String(GAP_OUTER)],
-          ['Square color',     SQUARE_COLOR],
-          ['Square opacity',   `${SQUARE_OPACITY}%`],
-          ['Used palette',     USED_PALETTE],
+          ['Category spacing',        String(GAP_OUTER)],
+          ['Square color',            SQUARE_COLOR],
+          ['Square opacity',          `${SQUARE_OPACITY}%`],
+          ['Used palette',            USED_PALETTE],
+          ['Corners',                 String(SQUARE_CORNERS)],
+          ['Customize each category', 'No'],
         ]} />
       </div>
 
@@ -309,19 +322,28 @@ function StylePanel() {
         <h3 className="text-sm font-semibold mb-3 px-3 py-2 rounded" style={{ background: '#EDE9FE' }}>
           Advanced styles
         </h3>
-        <h4 className="text-sm font-semibold mb-2 mt-3">Labels</h4>
+        <h4 className="text-sm font-semibold mb-2 mt-3">Category labels</h4>
         <StyleTable rows={[
-          ['Category labels',        CAT_LABELS_ENABLED  ? 'Enabled' : 'Disabled'],
-          ['Data labels',            DATA_LABELS_ENABLED ? 'Enabled' : 'Disabled'],
-          ['Background color',       LABEL_BG],
-          ['Background opacity',     `${LABEL_BG_OPACITY}%`],
-          ['Font family',            'Auto'],
-          ['Bold',                   LABEL_BOLD ? 'Yes' : 'No'],
-          ['Text color',             LABEL_COLOR],
-          ['Text size',              String(LABEL_FONT_SIZE)],
+          ['Enabled',            CAT_LABELS_ENABLED ? 'Enabled' : 'Disabled'],
+          ['Background color',   LABEL_BG],
+          ['Background opacity', `${LABEL_BG_OPACITY}%`],
+          ['Font family',        'Auto'],
+          ['Bold',               LABEL_BOLD ? 'Yes' : 'No'],
+          ['Color',              LABEL_COLOR],
+          ['Size',               String(LABEL_FONT_SIZE)],
+        ]} />
+        <h4 className="text-sm font-semibold mb-2 mt-3">Data labels</h4>
+        <StyleTable rows={[
+          ['Enabled',                  DATA_LABELS_ENABLED ? 'Enabled' : 'Disabled'],
+          ['Background color',         LABEL_BG],
+          ['Background opacity',       `${LABEL_BG_OPACITY}%`],
+          ['Font family',              'Auto'],
+          ['Bold',                     LABEL_BOLD ? 'Yes' : 'No'],
+          ['Color',                    LABEL_COLOR],
+          ['Size',                     String(LABEL_FONT_SIZE)],
           ['Display missing value as', '–'],
-          ['Decimals',               String(DECIMALS)],
-          ['Short number',           SHORT_NUMBER ? 'Yes' : 'No'],
+          ['Decimals',                 String(DECIMALS)],
+          ['Short number',             SHORT_NUMBER ? 'Yes' : 'No'],
         ]} />
       </div>
     </div>

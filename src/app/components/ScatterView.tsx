@@ -77,6 +77,22 @@ const CAT_LABEL_FONT_FAMILY = 'Auto';
 const CAT_LABEL_BOLD = false;
 const CAT_LABEL_COLOR = '#374151';
 const CAT_LABEL_SIZE = 12;
+const CAT_DECIMALS     = 1;
+const CAT_SHORT_NUM    = true;
+
+// Advanced styles > Data labels
+const DL_ENABLED      = false;
+const DL_POSITION     = 'Above';
+const DL_BG_COLOR     = '#FFFFFF';
+const DL_BG_OPACITY   = 0;
+const DL_FONT         = 'Auto';
+const DL_BOLD         = false;
+const DL_COLOR        = '#374151';
+const DL_SIZE         = 12;
+const DL_CORNERS      = 4;
+const DL_MISSING      = '–';
+const DL_DECIMALS     = 1;
+const DL_SHORT_NUM    = true;
 
 // ─── Monochrome palette — unified sequential assignment ───────────────────────
 const PALETTE = ['#0B3A67', '#154E84', '#2B6CA3', '#4A88BC'];
@@ -206,11 +222,12 @@ const CustomTooltip = ({ active, payload }: any) => {
       style={{
         background: '#fff',
         border: '1px solid #E5E7EB',
-        borderRadius: 6,
+        borderRadius: 8,
         padding: '8px 12px',
         fontFamily: FONT,
-        fontSize: 14,
+        fontSize: 13,
         color: '#374151',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
       }}
     >
       <div>x: {d?.x}%</div>
@@ -474,8 +491,31 @@ function StylePanel({ showRefLine, onToggleRefLine }: { showRefLine: boolean; on
             ['Bubble color', BUBBLE_COLOR],
             ['Bubble opacity', `${BUBBLE_OPACITY * 100}%`],
             ['Used palette', USED_PALETTE],
+            ['Customize each series', 'No'],
           ]}
         />
+
+        <SubHeader title="Bubbles / Series customization default" />
+        <table className="w-full text-sm border-collapse" style={{ fontFamily: FONT }}>
+          <thead>
+            <tr style={{ background: '#B8D4E8' }}>
+              <th className="text-left p-2 border border-gray-300">Series</th>
+              <th className="text-left p-2 border border-gray-300">Color</th>
+              <th className="text-left p-2 border border-gray-300">Opacity</th>
+              <th className="text-left p-2 border border-gray-300">Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            {CATEGORIES.map((cat) => (
+              <tr key={cat.name} style={{ background: '#fff' }}>
+                <td className="p-2 border border-gray-300">{cat.name}</td>
+                <td className="p-2 border border-gray-300">{BUBBLE_COLOR}</td>
+                <td className="p-2 border border-gray-300">{`${BUBBLE_OPACITY * 100}%`}</td>
+                <td className="p-2 border border-gray-300">{String(BUBBLE_SIZE)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Advanced styles */}
@@ -528,7 +568,7 @@ function StylePanel({ showRefLine, onToggleRefLine }: { showRefLine: boolean; on
             ['Show axis line', Y_SHOW_LINE ? 'Enabled' : 'Disabled'],
             ['Show axis labels', Y_SHOW_LABELS ? 'Enabled' : 'Disabled'],
             ['Font family', Y_FONT_FAMILY],
-            ['Text bold', Y_TEXT_BOLD ? 'Enabled' : 'Disabled'],
+            ['Bold', Y_TEXT_BOLD ? 'Yes' : 'No'],
             ['Color', Y_COLOR],
             ['Size', String(Y_SIZE)],
             ['Rotation', `${Y_ROTATION}°`],
@@ -542,7 +582,7 @@ function StylePanel({ showRefLine, onToggleRefLine }: { showRefLine: boolean; on
             ['Show axis line', X_SHOW_LINE ? 'Enabled' : 'Disabled'],
             ['Show axis labels', X_SHOW_LABELS ? 'Enabled' : 'Disabled'],
             ['Font family', X_FONT_FAMILY],
-            ['Text bold', X_TEXT_BOLD ? 'Enabled' : 'Disabled'],
+            ['Bold', X_TEXT_BOLD ? 'Yes' : 'No'],
             ['Color', X_COLOR],
             ['Size', String(X_SIZE)],
             ['Rotation', `${X_ROTATION}°`],
@@ -555,8 +595,26 @@ function StylePanel({ showRefLine, onToggleRefLine }: { showRefLine: boolean; on
             ['Show vertical gridlines', GRID_SHOW_VERTICAL ? 'Enabled' : 'Disabled'],
             ['Show horizontal gridlines', GRID_SHOW_HORIZONTAL ? 'Enabled' : 'Disabled'],
             ['Gridline style', GRID_STYLE],
-            ['Line color', GRID_COLOR],
-            ['Line width', String(GRID_WIDTH)],
+            ['Gridline color', GRID_COLOR],
+            ['Gridline width', String(GRID_WIDTH)],
+          ]}
+        />
+
+        <SubHeader title="Data labels" />
+        <StyleTable
+          rows={[
+            ['Enabled',                   DL_ENABLED    ? 'Yes' : 'No'],
+            ['Position',                  DL_POSITION],
+            ['Background color',          DL_BG_COLOR],
+            ['Background opacity',        `${DL_BG_OPACITY * 100}%`],
+            ['Font family',               DL_FONT],
+            ['Bold',                      DL_BOLD       ? 'Yes' : 'No'],
+            ['Color',                     DL_COLOR],
+            ['Size',                      String(DL_SIZE)],
+            ['Label corners',             String(DL_CORNERS)],
+            ['Display missing value as',  DL_MISSING],
+            ['Decimals',                  String(DL_DECIMALS)],
+            ['Short number',              DL_SHORT_NUM  ? 'Yes' : 'No'],
           ]}
         />
 
@@ -567,9 +625,12 @@ function StylePanel({ showRefLine, onToggleRefLine }: { showRefLine: boolean; on
             ['Background color', CAT_LABEL_BG],
             ['Background opacity', `${CAT_LABEL_BG_OPACITY * 100}%`],
             ['Font family', CAT_LABEL_FONT_FAMILY],
-            ['Bold', CAT_LABEL_BOLD ? 'Enabled' : 'Disabled'],
-            ['Text color', CAT_LABEL_COLOR],
-            ['Text size', String(CAT_LABEL_SIZE)],
+            ['Bold', CAT_LABEL_BOLD ? 'Yes' : 'No'],
+            ['Color', CAT_LABEL_COLOR],
+            ['Size', String(CAT_LABEL_SIZE)],
+            ['Display missing value as', '–'],
+            ['Decimals',                 String(CAT_DECIMALS)],
+            ['Short number',             CAT_SHORT_NUM ? 'Yes' : 'No'],
           ]}
         />
       </div>

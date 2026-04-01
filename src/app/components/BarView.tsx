@@ -313,7 +313,12 @@ function BarChartECharts({ variant, showRefLine, showDataLabels, labelPos }: { v
 
   const option: any = {
     tooltip: {
-      trigger: 'axis',
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: [8, 12],
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
+            trigger: 'axis',
       axisPointer: { type: 'shadow' },
       formatter: tooltipFormatter,
     },
@@ -396,7 +401,43 @@ function StyleConfiguration({ variant, showRefLine, onToggleRefLine, showDataLab
           ['Bar color', BASE_COLOR],
           ['Bar opacity', '100%'],
           ['Used palette', 'Monochrome'],
+          ['Customize each series', 'No'],
         ]} />
+
+        {/* Bars / Series customization defaults */}
+        <h4 className="font-semibold mb-2 mt-4" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Bars / Series customization defaults</h4>
+        <table className="w-full text-sm border-collapse" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>
+          <thead>
+            <tr className="bg-[#B8D4E8]">
+              <th className="text-left p-2 border border-gray-300">Series</th>
+              <th className="text-left p-2 border border-gray-300">Color</th>
+              <th className="text-left p-2 border border-gray-300">Opacity</th>
+              <th className="text-left p-2 border border-gray-300">Corners</th>
+            </tr>
+          </thead>
+          <tbody>
+            {([
+              ['Completed',   MONO_PALETTE[0]],
+              ['In Progress', MONO_PALETTE[1]],
+              ['Blocked',     MONO_PALETTE[2]],
+            ] as [string, string][]).map(([series, color], i) => (
+              <tr key={i}>
+                <td className="p-2 border border-gray-300">{series}</td>
+                <td className="p-2 border border-gray-300">
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="inline-block rounded-sm flex-shrink-0"
+                      style={{ width: 14, height: 14, backgroundColor: color, border: '1px solid rgba(0,0,0,0.12)' }}
+                    />
+                    <span>{color}</span>
+                  </span>
+                </td>
+                <td className="p-2 border border-gray-300">100%</td>
+                <td className="p-2 border border-gray-300">{BAR_CORNER_RADIUS}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Advanced styles - Reference line */}
@@ -496,9 +537,9 @@ function StyleConfiguration({ variant, showRefLine, onToggleRefLine, showDataLab
           ['Show axis line', 'No'],
           ['Show axis labels', 'Yes'],
           ['Font family', 'Auto'],
-          ['Text bold', 'No'],
-          ['Text color', '#6B7280'],
-          ['Text size', '12'],
+          ['Bold', 'No'],
+          ['Color', '#6B7280'],
+          ['Size', '12'],
           ['Rotation', '0°'],
         ]} />
 
@@ -510,9 +551,9 @@ function StyleConfiguration({ variant, showRefLine, onToggleRefLine, showDataLab
           ['Show axis line', 'No'],
           ['Show axis labels', 'Yes'],
           ['Font family', 'Auto'],
-          ['Text bold', 'No'],
-          ['Text color', '#6B7280'],
-          ['Text size', '12'],
+          ['Bold', 'No'],
+          ['Color', '#6B7280'],
+          ['Size', '12'],
           ['Rotation', '0°'],
         ]} />
       </div>

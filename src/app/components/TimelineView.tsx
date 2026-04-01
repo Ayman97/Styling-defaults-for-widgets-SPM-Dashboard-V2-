@@ -30,8 +30,43 @@ const TODAY_LINE_COLOR = '#0B3A67';
 const TODAY_LINE_WIDTH = 2;
 const TODAY_TEXT_COLOR = '#0B3A67';
 const TODAY_TEXT_SIZE = 14;
+const PHASE_COLOR   = '#0B3A67';
+const PHASE_PALETTE = 'Monochrome';
 
 const FONT = 'Plus Jakarta Sans, sans-serif';
+
+const TOOLTIP_STYLE: React.CSSProperties = {
+  position: 'fixed',
+  pointerEvents: 'none',
+  background: '#FFFFFF',
+  border: '1px solid #E5E7EB',
+  borderRadius: 8,
+  padding: '8px 12px',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+  fontFamily: FONT,
+  fontSize: 13,
+  color: '#374151',
+  zIndex: 9999,
+};
+
+interface TipState { visible: boolean; x: number; y: number; title: string; rows: {k:string;v:string}[]; }
+const HIDDEN_TIP: TipState = { visible: false, x: 0, y: 0, title: '', rows: [] };
+
+function useTip() {
+  const [tip, setTip] = React.useState<TipState>(HIDDEN_TIP);
+  const show = (e: React.MouseEvent, title: string, rows: {k:string;v:string}[]) =>
+    setTip({ visible: true, x: e.clientX + 14, y: e.clientY + 14, title, rows });
+  const move = (e: React.MouseEvent) =>
+    setTip(t => t.visible ? { ...t, x: e.clientX + 14, y: e.clientY + 14 } : t);
+  const hide = () => setTip(t => ({ ...t, visible: false }));
+  const TipEl = tip.visible ? (
+    <div style={TOOLTIP_STYLE}>
+      {tip.title && <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>{tip.title}</div>}
+      {tip.rows.map(({k, v}, i) => <div key={i}>{k}: <strong>{v}</strong></div>)}
+    </div>
+  ) : null;
+  return { show, move, hide, TipEl };
+}
 
 // ─── Layout tokens ───────────────────────────────────────────────────────────
 const HALF = PHASE_SIZE / 2;                     // 20
@@ -138,6 +173,7 @@ function MilestoneCircle({ number, isActive }: { number: number; isActive: boole
 // The connector spine is an absolute line from center of first circle to center of last.
 
 function HorizontalTimeline() {
+  const { show, move, hide, TipEl } = useTip();
   // Today dashed line: positioned vertically centered between the active phase and the next phase.
   // With flex-1 cells, each cell = 100/N % wide. Cell centers are at (2i+1)/(2N) * 100%.
   // Active = index 2, next = index 3. Midpoint X = average of their centers.
@@ -152,6 +188,7 @@ function HorizontalTimeline() {
 
   return (
     <div className="w-full" style={{ maxWidth: 700, position: 'relative' }}>
+      {TipEl}
       {/* ── Connector Spine ── */}
       <div
         style={{
@@ -208,13 +245,10 @@ function HorizontalTimeline() {
           return (
             <div
               key={phase.number}
-              style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                position: 'relative',
-              }}
+              style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', cursor: 'default' }}
+              onMouseEnter={e => show(e, phase.name, [{ k: 'Phase', v: String(phase.number) }, { k: 'Date', v: phase.date }])}
+              onMouseMove={move}
+              onMouseLeave={hide}
             >
               {/* Phase name (above circle) */}
               <span
@@ -279,6 +313,7 @@ function HorizontalTimeline() {
 // The connector spine is a vertical line from center of first circle to center of last.
 
 function VerticalTimeline() {
+  const { show, move, hide, TipEl } = useTip();
   // Each milestone row height is driven by the taller of the label block or the circle.
   // Label block = name (20px lineHeight) + 2px marginTop on date + date (20px lineHeight) = 42px.
   // Circle = PHASE_SIZE = 40px.  Row height = 42.
@@ -295,6 +330,7 @@ function VerticalTimeline() {
 
   return (
     <div style={{ position: 'relative', display: 'inline-flex', flexDirection: 'column' }}>
+      {TipEl}
       {/* ── Connector Spine ──
           Runs from center of first circle to center of last circle */}
       <div
@@ -353,11 +389,15 @@ function VerticalTimeline() {
         return (
           <div
             key={phase.number}
+            onMouseEnter={e => show(e, phase.name, [{ k: 'Phase', v: String(phase.number) }, { k: 'Date', v: phase.date }])}
+            onMouseMove={move}
+            onMouseLeave={hide}
             style={{
               display: 'flex',
               alignItems: 'center',
               position: 'relative',
               zIndex: 2,
+              cursor: 'default',
               marginBottom: isLast ? 0 : V_MILESTONE_GAP,
             }}
           >
@@ -425,32 +465,35 @@ function StyleConfiguration({ variant }: { variant: TimelineSubTab }) {
         <h3 className="text-lg font-semibold mb-3 bg-[#F5E6D3] px-3 py-2 rounded" style={{ fontFamily: FONT }}>Basic styles</h3>
         <h4 className="font-semibold mb-2" style={{ fontFamily: FONT }}>Phases</h4>
         <StyleTable rows={[
-          ['Show phase number', '✅ Yes'],
+          ['Show phase number', 'Yes'],
           ['Phase size', '40'],
           ['Background color', '#FFFFFF'],
           ['Background opacity', '100%'],
           ['Active background color', '#0B3A67'],
           ['Active number color', '#FFFFFF'],
+          ['Phase color', PHASE_COLOR],
+          ['Used palette', PHASE_PALETTE],
           ['Border directions', 'All'],
           ['Border style', 'Solid'],
           ['Border color', '#E5E7EB'],
           ['Border width', '2'],
           ['Phase number font family', 'Auto'],
-          ['Phase number bold', '✅ Yes'],
+          ['Phase number bold', 'Yes'],
           ['Phase number color', '#334155'],
           ['Phase number size', '14'],
-          ['Show phase dates', '✅ Yes'],
+          ['Show phase dates', 'Yes'],
           ['Phase dates font family', 'Auto'],
           ['Phase dates bold', 'No'],
           ['Phase dates color', '#64748B'],
           ['Phase dates size', '14'],
           ['Phase dates position', phaseDatesPosition],
-          ['Show phase names', '✅ Yes'],
+          ['Show phase names', 'Yes'],
           ['Phase names font family', 'Auto'],
-          ['Phase names bold', '✅ Yes'],
+          ['Phase names bold', 'Yes'],
           ['Phase names color', '#111827'],
           ['Phase names size', '14'],
           ['Phase names position', phaseNamesPosition],
+          ['Customize each phase', 'No'],
         ]} />
       </div>
 
@@ -466,7 +509,7 @@ function StyleConfiguration({ variant }: { variant: TimelineSubTab }) {
           ['Today line color', '#0B3A67'],
           ['Today line width', '2'],
           ['Today text font family', 'Auto'],
-          ['Today text bold', '✅ Yes'],
+          ['Today text bold', 'Yes'],
           ['Today text color', '#0B3A67'],
           ['Today text size', '14'],
         ]} />

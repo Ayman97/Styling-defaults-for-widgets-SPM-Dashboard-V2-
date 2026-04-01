@@ -2,6 +2,39 @@ import React from 'react';
 
 const FONT = 'Plus Jakarta Sans, sans-serif';
 
+const TOOLTIP_STYLE: React.CSSProperties = {
+  position: 'fixed',
+  pointerEvents: 'none',
+  background: '#FFFFFF',
+  border: '1px solid #E5E7EB',
+  borderRadius: 8,
+  padding: '8px 12px',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+  fontFamily: FONT,
+  fontSize: 13,
+  color: '#374151',
+  zIndex: 9999,
+};
+
+interface TipState { visible: boolean; x: number; y: number; title: string; rows: {k:string;v:string}[]; }
+const HIDDEN_TIP: TipState = { visible: false, x: 0, y: 0, title: '', rows: [] };
+
+function useTip() {
+  const [tip, setTip] = React.useState<TipState>(HIDDEN_TIP);
+  const show = (e: React.MouseEvent, title: string, rows: {k:string;v:string}[]) =>
+    setTip({ visible: true, x: e.clientX + 14, y: e.clientY + 14, title, rows });
+  const move = (e: React.MouseEvent) =>
+    setTip(t => t.visible ? { ...t, x: e.clientX + 14, y: e.clientY + 14 } : t);
+  const hide = () => setTip(t => ({ ...t, visible: false }));
+  const TipEl = tip.visible ? (
+    <div style={TOOLTIP_STYLE}>
+      {tip.title && <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>{tip.title}</div>}
+      {tip.rows.map(({k, v}, i) => <div key={i}>{k}: <strong>{v}</strong></div>)}
+    </div>
+  ) : null;
+  return { show, move, hide, TipEl };
+}
+
 // ─── Style Constants (extracted exactly from style panel image) ────────────────
 
 // Basic styles – Table borders
@@ -134,8 +167,12 @@ function renderCell(type: RowType, value: number | string) {
 }
 
 // ─── Table Visualization ──────────────────────────────────────────────────────
-const TableViz: React.FC = () => (
-  <table style={{ borderCollapse: 'collapse', tableLayout: 'auto' }}>
+function TableViz() {
+  const { show, move, hide, TipEl } = useTip();
+  return (
+    <>
+      {TipEl}
+      <table style={{ borderCollapse: 'collapse', tableLayout: 'auto' }}>
     <thead>
       <tr>
         {/* empty corner cell */}
@@ -168,7 +205,13 @@ const TableViz: React.FC = () => (
     </thead>
     <tbody>
       {ROWS.map((row, rowIdx) => (
-        <tr key={row.label}>
+        <tr
+          key={row.label}
+          style={{ cursor: 'default' }}
+          onMouseEnter={e => show(e, row.label, COLUMNS.map((col, i) => ({ k: col, v: String(row.values[i]) })))}
+          onMouseMove={move}
+          onMouseLeave={hide}
+        >
           <td style={{
             backgroundColor: RH_BG_COLOR,
             height: RH_HEIGHT + 'px',
@@ -197,7 +240,10 @@ const TableViz: React.FC = () => (
       ))}
     </tbody>
   </table>
-);
+    </>
+  );
+}
+
 
 // ─── Style Panel ──────────────────────────────────────────────────────────────
 type StyleRow = [string, string];
@@ -226,7 +272,7 @@ const SECTIONS: Section[] = [
       ['Background opacity',  CH_BG_OPACITY + '%'],
       ['Font family',         CH_FONT_FAM],
       ['Bold',                CH_BOLD ? 'Yes' : 'No'],
-      ['Text color',          CH_TEXT_COLOR],
+      ['Color',               CH_TEXT_COLOR],
       ['Size',                String(CH_SIZE)],
       ['Text alignment',      CH_ALIGNMENT],
       ['Border style',        CH_BORDER_STYLE],
@@ -245,7 +291,7 @@ const SECTIONS: Section[] = [
       ['Background opacity',  RH_BG_OPACITY + '%'],
       ['Font family',         RH_FONT_FAM],
       ['Bold',                RH_BOLD ? 'Yes' : 'No'],
-      ['Text color',          RH_TEXT_COLOR],
+      ['Color',               RH_TEXT_COLOR],
       ['Size',                String(RH_SIZE)],
       ['Text alignment',      RH_ALIGNMENT],
       ['Border style',        RH_BORDER_STYLE],
@@ -264,7 +310,7 @@ const SECTIONS: Section[] = [
       ['Alternating row opacity', CV_ALT_OPACITY + '%'],
       ['Font family',             CV_FONT_FAM],
       ['Bold',                    CV_BOLD ? 'Yes' : 'No'],
-      ['Text color',              CV_TEXT_COLOR],
+      ['Color',                   CV_TEXT_COLOR],
       ['Size',                    String(CV_SIZE)],
       ['Border style',            CV_BORDER_STYLE],
       ['Border color',            CV_BORDER_COLOR],
@@ -287,11 +333,11 @@ const SECTIONS: Section[] = [
       ['Show icons',              PC_SHOW_ICONS ? 'Yes' : 'No'],
       ['Base background color',   PC_BASE_BG],
       ['Base opacity',            PC_BASE_OPACITY + '%'],
-      ['Alternating color',       PC_ALT_COLOR],
+      ['Alternating row color',   PC_ALT_COLOR],
       ['Alternating opacity',     PC_ALT_OPACITY + '%'],
       ['Font family',             PC_FONT_FAM],
       ['Bold',                    PC_BOLD ? 'Yes' : 'No'],
-      ['Text color',              PC_TEXT_COLOR],
+      ['Color',                   PC_TEXT_COLOR],
       ['Size',                    String(PC_SIZE)],
       ['Border style',            PC_BORDER_STYLE],
       ['Border color',            PC_BORDER_COLOR],

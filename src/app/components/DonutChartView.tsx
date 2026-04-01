@@ -1,5 +1,31 @@
 import React, { useState } from 'react';
-import { PieChart, Pie, Cell, ResponsiveContainer, Label } from 'recharts';
+import { PieChart, Pie, Cell, ResponsiveContainer, Label, Tooltip } from 'recharts';
+
+const TOOLTIP_STYLE = {
+  background: '#FFFFFF',
+  border: '1px solid #E5E7EB',
+  borderRadius: 8,
+  padding: '8px 12px',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+  fontFamily: 'Plus Jakarta Sans, sans-serif',
+  fontSize: 13,
+  color: '#374151',
+};
+
+const total = [35, 25, 20, 15, 5].reduce((a, b) => a + b, 0);
+
+const PieTooltip = ({ active, payload }: any) => {
+  if (!active || !payload?.length) return null;
+  const { name, value } = payload[0]?.payload ?? {};
+  const pct = total > 0 ? ((value / total) * 100).toFixed(1) : '0';
+  return (
+    <div style={TOOLTIP_STYLE}>
+      <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>{name}</div>
+      <div>Value: <strong>{value}</strong></div>
+      <div>Share: <strong>{pct}%</strong></div>
+    </div>
+  );
+};
 
 const data = [
   { name: 'Category A', value: 35 },
@@ -37,8 +63,8 @@ const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, index 
 export function DonutChartView() {
   const [subTab, setSubTab] = useState<'donut' | 'pie'>('donut');
   
-  const innerRadius = subTab === 'donut' ? '50%' : '0%';
-  const sliceCorners = subTab === 'donut' ? 6 : 4;
+  const innerRadius = subTab === 'donut' ? '40%' : '0%';
+  const sliceCorners = subTab === 'donut' ? 8 : 4;
   const showCenterValue = subTab === 'donut';
 
   const totalValue = data.reduce((sum, item) => sum + item.value, 0);
@@ -77,6 +103,7 @@ export function DonutChartView() {
           <div className="w-full h-[500px]">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
+                <Tooltip content={<PieTooltip />} />
                 <Pie
                   data={data}
                   cx="50%"
@@ -98,7 +125,7 @@ export function DonutChartView() {
                       <Label
                         value="Total"
                         position="center"
-                        fill="#667280"
+                        fill="#6B7280"
                         fontSize={12}
                         fontFamily="Plus Jakarta Sans, sans-serif"
                         dy={-10}
@@ -108,6 +135,7 @@ export function DonutChartView() {
                         position="center"
                         fill="#111827"
                         fontSize={32}
+                        fontWeight="bold"
                         fontFamily="Plus Jakarta Sans, sans-serif"
                         dy={15}
                       />
@@ -135,7 +163,7 @@ export function DonutChartView() {
                 </tr>
               </thead>
               <tbody>
-                <tr><td className="p-2 border border-gray-300">Inner radius</td><td className="p-2 border border-gray-300"><Val v={subTab === 'donut' ? '50%' : '0%'} /></td></tr>
+                <tr><td className="p-2 border border-gray-300">Inner radius</td><td className="p-2 border border-gray-300"><Val v={subTab === 'donut' ? '40%' : '0%'} /></td></tr>
                 <tr><td className="p-2 border border-gray-300">Slice spacing</td><td className="p-2 border border-gray-300"><Val v="2" /></td></tr>
                 <tr><td className="p-2 border border-gray-300">Slice corners</td><td className="p-2 border border-gray-300"><Val v={String(sliceCorners)} /></td></tr>
                 <tr><td className="p-2 border border-gray-300">Slice color</td><td className="p-2 border border-gray-300"><Val v="#0B3A67" /></td></tr>
@@ -212,9 +240,9 @@ export function DonutChartView() {
               </thead>
               <tbody>
                 <tr><td className="p-2 border border-gray-300">Font family</td><td className="p-2 border border-gray-300"><Val v="Auto" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Text bold</td><td className="p-2 border border-gray-300"><Val v="No" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Text color</td><td className="p-2 border border-gray-300"><Val v="#667280" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Text size</td><td className="p-2 border border-gray-300"><Val v="12" /></td></tr>
+                <tr><td className="p-2 border border-gray-300">Bold</td><td className="p-2 border border-gray-300"><Val v="No" /></td></tr>
+                <tr><td className="p-2 border border-gray-300">Color</td><td className="p-2 border border-gray-300"><Val v="#6B7280" /></td></tr>
+                <tr><td className="p-2 border border-gray-300">Size</td><td className="p-2 border border-gray-300"><Val v="12" /></td></tr>
               </tbody>
             </table>
           </div>
@@ -231,36 +259,9 @@ export function DonutChartView() {
               </thead>
               <tbody>
                 <tr><td className="p-2 border border-gray-300">Font family</td><td className="p-2 border border-gray-300"><Val v="Auto" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Text bold</td><td className="p-2 border border-gray-300"><Val v="No" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Text color</td><td className="p-2 border border-gray-300"><Val v="#111827" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Text size</td><td className="p-2 border border-gray-300"><Val v="32" /></td></tr>
-              </tbody>
-            </table>
-          </div>
-
-          {/* Data Labels */}
-          <div className="mb-8">
-            <h4 className="font-semibold mb-2">Data labels</h4>
-            <table className="w-full text-sm border-collapse">
-              <thead>
-                <tr className="bg-[#B8D4E8]">
-                  <th className="text-left p-2 border border-gray-300">Style</th>
-                  <th className="text-left p-2 border border-gray-300">Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr><td className="p-2 border border-gray-300">Enabled</td><td className="p-2 border border-gray-300"><Val v="Yes" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Position</td><td className="p-2 border border-gray-300"><Val v="Outside" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Background color</td><td className="p-2 border border-gray-300"><Val v="Transparent" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Background opacity</td><td className="p-2 border border-gray-300"><Val v="0%" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Font family</td><td className="p-2 border border-gray-300"><Val v="Auto" /></td></tr>
                 <tr><td className="p-2 border border-gray-300">Bold</td><td className="p-2 border border-gray-300"><Val v="Yes" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Text color</td><td className="p-2 border border-gray-300"><Val v="#111827" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Text size</td><td className="p-2 border border-gray-300"><Val v="12" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Label corners</td><td className="p-2 border border-gray-300"><Val v="8" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Display missing value as</td><td className="p-2 border border-gray-300"><Val v="–" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Decimals</td><td className="p-2 border border-gray-300"><Val v="1" /></td></tr>
-                <tr><td className="p-2 border border-gray-300">Short number</td><td className="p-2 border border-gray-300"><Val v="Yes" /></td></tr>
+                <tr><td className="p-2 border border-gray-300">Color</td><td className="p-2 border border-gray-300"><Val v="#111827" /></td></tr>
+                <tr><td className="p-2 border border-gray-300">Size</td><td className="p-2 border border-gray-300"><Val v="32" /></td></tr>
               </tbody>
             </table>
           </div>

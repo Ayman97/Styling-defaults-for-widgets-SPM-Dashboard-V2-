@@ -170,7 +170,12 @@ function getOption(): echarts.EChartsCoreOption {
     backgroundColor: '#FFFFFF',
     animation: false,
     tooltip: {
-      formatter: (p: any) => {
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: [8, 12],
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
+            formatter: (p: any) => {
         const [xi, yi, rawVal] = p.data.value as [number, number, number];
         const val   = rawVal === -1 ? null : rawVal;
         const color = getRagColor(val);
@@ -408,8 +413,8 @@ function StylePanel() {
             ['Used palette',   USED_PALETTE],
             ['Font family',    LABEL_FONT],
             ['Bold',           LABEL_BOLD ? 'Yes' : 'No'],
-            ['Text color',     LABEL_COLOR],
-            ['Text size',      `${LABEL_SIZE}`],
+            ['Color',          LABEL_COLOR],
+            ['Size',           `${LABEL_SIZE}`],
             ['Border',         BORDER_ON ? 'Yes' : 'Disabled'],
             ['Border color',   BORDER_COLOR],
             ['Border width',   `${BORDER_WIDTH}`],
@@ -477,7 +482,7 @@ function StylePanel() {
         <Section
           title="Data Labels"
           rows={[
-            ['Data labels',              DL_ON     ? 'Yes' : 'No'],
+            ['Enabled',                  DL_ON     ? 'Yes' : 'No'],
             ['Background color',         DL_BG],
             ['Background opacity',       `${DL_BG_OPC}%`],
             ['Font family',              'Auto'],

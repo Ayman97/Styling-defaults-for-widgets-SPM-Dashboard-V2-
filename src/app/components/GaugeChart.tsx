@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, useSpring } from 'motion/react';
 
 const FONT = 'Plus Jakarta Sans, sans-serif';
+const USED_PALETTE = 'Monochrome';
 
 // ── Data domain ──────────────────────────────────────────────────────────────
 const GAU_MIN = 20;
@@ -319,7 +320,7 @@ export const GaugeChart: React.FC<GaugeChartProps> = ({ initialValue = 48 }) => 
         style={{
           fontSize: '27px',
           fontWeight: '700',
-          color: '#4E4749',
+          color: '#0F172A',
           fontFamily: FONT,
           marginTop: '-6px',
           letterSpacing: '-0.5px',

@@ -2,6 +2,39 @@ import React, { useState } from 'react';
 
 const FONT = 'Plus Jakarta Sans, sans-serif';
 
+const TOOLTIP_STYLE: React.CSSProperties = {
+  position: 'fixed',
+  pointerEvents: 'none',
+  background: '#FFFFFF',
+  border: '1px solid #E5E7EB',
+  borderRadius: 8,
+  padding: '8px 12px',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+  fontFamily: FONT,
+  fontSize: 13,
+  color: '#374151',
+  zIndex: 9999,
+};
+
+interface TipState { visible: boolean; x: number; y: number; title: string; rows: {k:string;v:string}[]; }
+const HIDDEN_TIP: TipState = { visible: false, x: 0, y: 0, title: '', rows: [] };
+
+function useTip() {
+  const [tip, setTip] = React.useState<TipState>(HIDDEN_TIP);
+  const show = (e: React.MouseEvent, title: string, rows: {k:string;v:string}[]) =>
+    setTip({ visible: true, x: e.clientX + 14, y: e.clientY + 14, title, rows });
+  const move = (e: React.MouseEvent) =>
+    setTip(t => t.visible ? { ...t, x: e.clientX + 14, y: e.clientY + 14 } : t);
+  const hide = () => setTip(t => ({ ...t, visible: false }));
+  const TipEl = tip.visible ? (
+    <div style={TOOLTIP_STYLE}>
+      {tip.title && <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>{tip.title}</div>}
+      {tip.rows.map(({k, v}, i) => <div key={i}>{k}: <strong>{v}</strong></div>)}
+    </div>
+  ) : null;
+  return { show, move, hide, TipEl };
+}
+
 type TableVariant = 'table' | 'pivot';
 
 const SUB_TABS: Array<{ key: TableVariant; label: string }> = [
@@ -110,6 +143,82 @@ const PCV_MISSING               = '–';
 const PCV_DECIMALS              = 1;
 const PCV_SHORT_NUM             = true;
 const PCV_CUSTOMIZE             = false;
+
+// ─── Style constants – Pivot Table Totals ─────────────────────────────────────
+const PTH_ENABLED               = true;
+const PTH_LABEL                 = 'Total';
+const PTH_WIDTH                 = 'Auto';
+const PTH_HEIGHT                = 48;
+const PTH_BG_COLOR              = '#EFF6FF';
+const PTH_BG_OPACITY            = 100;
+const PTH_FONT                  = 'Auto';
+const PTH_BOLD                  = true;
+const PTH_COLOR                 = '#0B3A67';
+const PTH_SIZE                  = 14;
+const PTH_ALIGN                 = 'Left';
+const PTH_BORDER_STYLE          = 'Solid';
+const PTH_BORDER_COLOR          = '#E5E7EB';
+const PTH_BORDER_WIDTH          = 1;
+const PTH_BORDER_VIS            = 'Bottom';
+
+const PTV_BG_COLOR              = '#F0F9FF';
+const PTV_BG_OPACITY            = 100;
+const PTV_FONT                  = 'Auto';
+const PTV_BOLD                  = true;
+const PTV_COLOR                 = '#0F172A';
+const PTV_SIZE                  = 14;
+const PTV_BORDER_STYLE          = 'Solid';
+const PTV_BORDER_COLOR          = '#E5E7EB';
+const PTV_BORDER_WIDTH          = 1;
+const PTV_BORDER_VIS            = 'Bottom';
+const PTV_PT                    = 8;
+const PTV_PR                    = 12;
+const PTV_PB                    = 8;
+const PTV_PL                    = 12;
+const PTV_MISSING               = '–';
+const PTV_DECIMALS              = 1;
+const PTV_SHORT_NUM             = true;
+
+const TPRH_ENABLED              = true;
+const TPRH_LABEL                = 'Total';
+const TPRH_WIDTH                = 'Auto';
+const TPRH_HEIGHT               = 48;
+const TPRH_BG_COLOR             = '#EFF6FF';
+const TPRH_BG_OPACITY           = 100;
+const TPRH_FONT                 = 'Auto';
+const TPRH_BOLD                 = true;
+const TPRH_COLOR                = '#0B3A67';
+const TPRH_SIZE                 = 14;
+const TPRH_ALIGN                = 'Left';
+const TPRH_BORDER_STYLE         = 'Solid';
+const TPRH_BORDER_COLOR         = '#E5E7EB';
+const TPRH_BORDER_WIDTH         = 1;
+const TPRH_BORDER_VIS           = 'Top';
+
+const PRV_BG_COLOR              = '#F0F9FF';
+const PRV_BG_OPACITY            = 100;
+const PRV_FONT                  = 'Auto';
+const PRV_BOLD                  = true;
+const PRV_COLOR                 = '#0F172A';
+const PRV_SIZE                  = 14;
+const PRV_BORDER_STYLE          = 'Solid';
+const PRV_BORDER_COLOR          = '#E5E7EB';
+const PRV_BORDER_WIDTH          = 1;
+const PRV_BORDER_VIS            = 'Top';
+const PRV_PT                    = 8;
+const PRV_PR                    = 12;
+const PRV_PB                    = 8;
+const PRV_PL                    = 12;
+const PRV_MISSING               = '–';
+const PRV_DECIMALS              = 1;
+const PRV_SHORT_NUM             = true;
+
+const GTC_BG_COLOR              = '#DBEAFE';
+const GTC_BG_OPACITY            = 100;
+const GTC_FONT                  = 'Auto';
+const GTC_BOLD                  = true;
+const GTC_COLOR                 = '#0B3A67';
+const GTC_SIZE                  = 14;
 
 // ─── Data – Regular Table ─────────────────────────────────────────────────────
 interface TableRow {
@@ -247,9 +356,9 @@ const tableSections: StyleSection[] = [
       ['Background color',   CH_BG_COLOR],
       ['Background opacity', CH_BG_OPACITY + '%'],
       ['Font family',        CH_FONT_FAM],
-      ['Text bold',          CH_BOLD ? 'Yes' : 'No'],
-      ['Text color',         CH_TEXT_COLOR],
-      ['Text size',          String(CH_SIZE)],
+      ['Bold',               CH_BOLD ? 'Yes' : 'No'],
+      ['Color',              CH_TEXT_COLOR],
+      ['Size',               String(CH_SIZE)],
       ['Text alignment',     CH_ALIGNMENT],
       ['Border style',       CH_BORDER_STYLE],
       ['Border color',       CH_BORDER_COLOR],
@@ -263,12 +372,12 @@ const tableSections: StyleSection[] = [
     rows: [
       ['Base background color',    CV_BASE_BG],
       ['Base background opacity',  CV_BASE_OPACITY + '%'],
-      ['Alternating color',        CV_ALT_COLOR],
+      ['Alternating row color',    CV_ALT_COLOR],
       ['Alternating opacity',      CV_ALT_OPACITY + '%'],
       ['Font family',              CV_FONT_FAM],
-      ['Text bold',                CV_BOLD ? 'Yes' : 'No'],
-      ['Text color',               CV_TEXT_COLOR],
-      ['Text size',                String(CV_SIZE)],
+      ['Bold',                     CV_BOLD ? 'Yes' : 'No'],
+      ['Color',                    CV_TEXT_COLOR],
+      ['Size',                     String(CV_SIZE)],
       ['Border style',             CV_BORDER_STYLE],
       ['Border color',             CV_BORDER_COLOR],
       ['Border width',             String(CV_BORDER_WIDTH)],
@@ -290,12 +399,12 @@ const tableSections: StyleSection[] = [
       ['Show icons',               'No'],
       ['Base background color',    CV_BASE_BG],
       ['Base background opacity',  CV_BASE_OPACITY + '%'],
-      ['Alternating color',        CV_ALT_COLOR],
+      ['Alternating row color',    CV_ALT_COLOR],
       ['Alternating opacity',      CV_ALT_OPACITY + '%'],
       ['Font family',              CV_FONT_FAM],
-      ['Text bold',                CV_BOLD ? 'Yes' : 'No'],
-      ['Text color',               CV_TEXT_COLOR],
-      ['Text size',                String(CV_SIZE)],
+      ['Bold',                     CV_BOLD ? 'Yes' : 'No'],
+      ['Color',                    CV_TEXT_COLOR],
+      ['Size',                     String(CV_SIZE)],
       ['Border style',             CV_BORDER_STYLE],
       ['Border color',             CV_BORDER_COLOR],
       ['Border width',             String(CV_BORDER_WIDTH)],
@@ -333,7 +442,7 @@ const pivotSections: StyleSection[] = [
       ['Background opacity', PCT_BG_OPACITY + '%'],
       ['Font family',        PCT_FONT_FAM],
       ['Bold',               PCT_BOLD ? 'Yes' : 'No'],
-      ['Text color',         PCT_TEXT_COLOR],
+      ['Color',              PCT_TEXT_COLOR],
       ['Size',               String(PCT_SIZE)],
       ['Text alignment',     PCT_ALIGNMENT],
       ['Border style',       PCT_BORDER_STYLE],
@@ -352,7 +461,7 @@ const pivotSections: StyleSection[] = [
       ['Background opacity', PRH_BG_OPACITY + '%'],
       ['Font family',        PRH_FONT_FAM],
       ['Bold',               PRH_BOLD ? 'Yes' : 'No'],
-      ['Text color',         PRH_TEXT_COLOR],
+      ['Color',              PRH_TEXT_COLOR],
       ['Size',               String(PRH_SIZE)],
       ['Text alignment',     PRH_ALIGNMENT],
       ['Border style',       PRH_BORDER_STYLE],
@@ -371,7 +480,7 @@ const pivotSections: StyleSection[] = [
       ['Alternating row opacity', PCV_ALT_OPACITY + '%'],
       ['Font family',             PCV_FONT_FAM],
       ['Bold',                    PCV_BOLD ? 'Yes' : 'No'],
-      ['Text color',              PCV_TEXT_COLOR],
+      ['Color',                   PCV_TEXT_COLOR],
       ['Size',                    String(PCV_SIZE)],
       ['Border style',            PCV_BORDER_STYLE],
       ['Border color',            PCV_BORDER_COLOR],
@@ -398,7 +507,7 @@ const pivotSections: StyleSection[] = [
       ['Alternating row opacity', PCV_ALT_OPACITY + '%'],
       ['Font family',             PCV_FONT_FAM],
       ['Bold',                    PCV_BOLD ? 'Yes' : 'No'],
-      ['Text color',              PCV_TEXT_COLOR],
+      ['Color',                   PCV_TEXT_COLOR],
       ['Size',                    String(PCV_SIZE)],
       ['Border style',            PCV_BORDER_STYLE],
       ['Border color',            PCV_BORDER_COLOR],
@@ -413,13 +522,116 @@ const pivotSections: StyleSection[] = [
       ['Short number',            PCV_SHORT_NUM ? 'Yes' : 'No'],
     ],
   },
+  {
+    title: 'Advanced styles – Total column headers',
+    headerBg: '#E7F4FB',
+    rows: [
+      ['Enabled',            PTH_ENABLED ? 'Yes' : 'No'],
+      ['Label',              PTH_LABEL],
+      ['Width',              PTH_WIDTH],
+      ['Height',             String(PTH_HEIGHT)],
+      ['Background color',   PTH_BG_COLOR],
+      ['Background opacity', PTH_BG_OPACITY + '%'],
+      ['Font family',        PTH_FONT],
+      ['Bold',               PTH_BOLD ? 'Yes' : 'No'],
+      ['Color',              PTH_COLOR],
+      ['Size',               String(PTH_SIZE)],
+      ['Text alignment',     PTH_ALIGN],
+      ['Border style',       PTH_BORDER_STYLE],
+      ['Border color',       PTH_BORDER_COLOR],
+      ['Border width',       String(PTH_BORDER_WIDTH)],
+      ['Border visibility',  PTH_BORDER_VIS],
+    ],
+  },
+  {
+    title: 'Advanced styles – Total column values',
+    headerBg: '#F4F0FA',
+    rows: [
+      ['Background color',        PTV_BG_COLOR],
+      ['Background opacity',      PTV_BG_OPACITY + '%'],
+      ['Font family',             PTV_FONT],
+      ['Bold',                    PTV_BOLD ? 'Yes' : 'No'],
+      ['Color',                   PTV_COLOR],
+      ['Size',                    String(PTV_SIZE)],
+      ['Border style',            PTV_BORDER_STYLE],
+      ['Border color',            PTV_BORDER_COLOR],
+      ['Border width',            String(PTV_BORDER_WIDTH)],
+      ['Border visibility',       PTV_BORDER_VIS],
+      ['Padding top',             String(PTV_PT)],
+      ['Padding right',           String(PTV_PR)],
+      ['Padding bottom',          String(PTV_PB)],
+      ['Padding left',            String(PTV_PL)],
+      ['Display missing value as',PTV_MISSING],
+      ['Decimals',                String(PTV_DECIMALS)],
+      ['Short number',            PTV_SHORT_NUM ? 'Yes' : 'No'],
+    ],
+  },
+  {
+    title: 'Advanced styles – Total row headers',
+    headerBg: '#E7F4FB',
+    rows: [
+      ['Enabled',            TPRH_ENABLED ? 'Yes' : 'No'],
+      ['Label',              TPRH_LABEL],
+      ['Width',              TPRH_WIDTH],
+      ['Height',             String(TPRH_HEIGHT)],
+      ['Background color',   TPRH_BG_COLOR],
+      ['Background opacity', TPRH_BG_OPACITY + '%'],
+      ['Font family',        TPRH_FONT],
+      ['Bold',               TPRH_BOLD ? 'Yes' : 'No'],
+      ['Color',              TPRH_COLOR],
+      ['Size',               String(TPRH_SIZE)],
+      ['Text alignment',     TPRH_ALIGN],
+      ['Border style',       TPRH_BORDER_STYLE],
+      ['Border color',       TPRH_BORDER_COLOR],
+      ['Border width',       String(TPRH_BORDER_WIDTH)],
+      ['Border visibility',  TPRH_BORDER_VIS],
+    ],
+  },
+  {
+    title: 'Advanced styles – Total row values',
+    headerBg: '#F4F0FA',
+    rows: [
+      ['Background color',        PRV_BG_COLOR],
+      ['Background opacity',      PRV_BG_OPACITY + '%'],
+      ['Font family',             PRV_FONT],
+      ['Bold',                    PRV_BOLD ? 'Yes' : 'No'],
+      ['Color',                   PRV_COLOR],
+      ['Size',                    String(PRV_SIZE)],
+      ['Border style',            PRV_BORDER_STYLE],
+      ['Border color',            PRV_BORDER_COLOR],
+      ['Border width',            String(PRV_BORDER_WIDTH)],
+      ['Border visibility',       PRV_BORDER_VIS],
+      ['Padding top',             String(PRV_PT)],
+      ['Padding right',           String(PRV_PR)],
+      ['Padding bottom',          String(PRV_PB)],
+      ['Padding left',            String(PRV_PL)],
+      ['Display missing value as',PRV_MISSING],
+      ['Decimals',                String(PRV_DECIMALS)],
+      ['Short number',            PRV_SHORT_NUM ? 'Yes' : 'No'],
+    ],
+  },
+  {
+    title: 'Advanced styles – Grand total cell',
+    headerBg: '#FEF7E6',
+    rows: [
+      ['Background color',   GTC_BG_COLOR],
+      ['Background opacity', GTC_BG_OPACITY + '%'],
+      ['Font family',        GTC_FONT],
+      ['Bold',               GTC_BOLD ? 'Yes' : 'No'],
+      ['Color',              GTC_COLOR],
+      ['Size',               String(GTC_SIZE)],
+    ],
+  },
 ];
 
 // ─── Visualizations ───────────────────────────────────────────────────────────
 function RegularTable() {
+  const { show, move, hide, TipEl } = useTip();
   const borderBottom = CV_BORDER_WIDTH + 'px solid ' + CV_BORDER_COLOR;
   return (
-    <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: FONT }}>
+    <>
+      {TipEl}
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: FONT }}>
       <thead>
         <tr style={{ backgroundColor: CH_BG_COLOR, height: CH_HEIGHT + 'px' }}>
           {['ID', 'Product', 'Category', 'Price', 'Stock', 'Status'].map((col) => (
@@ -441,7 +653,19 @@ function RegularTable() {
       </thead>
       <tbody>
         {tableData.map((row) => (
-          <tr key={row.id} style={{ backgroundColor: CV_BASE_BG }}>
+          <tr
+            key={row.id}
+            style={{ backgroundColor: CV_BASE_BG, cursor: 'default' }}
+            onMouseEnter={e => show(e, row.product, [
+              { k: 'ID', v: String(row.id) },
+              { k: 'Category', v: row.category },
+              { k: 'Price', v: '$' + row.price.toFixed(1) },
+              { k: 'Stock', v: String(row.stock) },
+              { k: 'Status', v: row.status },
+            ])}
+            onMouseMove={move}
+            onMouseLeave={hide}
+          >
             <td style={{ color: CV_TEXT_COLOR, fontSize: CV_SIZE + 'px', borderBottom, padding: CV_PAD_TOP + 'px ' + CV_PAD_RIGHT + 'px ' + CV_PAD_BOTTOM + 'px ' + CV_PAD_LEFT + 'px' }}>{row.id}</td>
             <td style={{ color: CV_TEXT_COLOR, fontSize: CV_SIZE + 'px', borderBottom, padding: CV_PAD_TOP + 'px ' + CV_PAD_RIGHT + 'px ' + CV_PAD_BOTTOM + 'px ' + CV_PAD_LEFT + 'px' }}>{row.product}</td>
             <td style={{ color: CV_TEXT_COLOR, fontSize: CV_SIZE + 'px', borderBottom, padding: CV_PAD_TOP + 'px ' + CV_PAD_RIGHT + 'px ' + CV_PAD_BOTTOM + 'px ' + CV_PAD_LEFT + 'px' }}>{row.category}</td>
@@ -452,6 +676,7 @@ function RegularTable() {
         ))}
       </tbody>
     </table>
+    </>
   );
 }
 
@@ -474,6 +699,7 @@ function Chevron({ expanded }: { expanded: boolean }) {
 
 // ─── Pivot Table ──────────────────────────────────────────────────────────────
 function PivotTable() {
+  const { show, move, hide, TipEl } = useTip();
   const [expanded, setExpanded] = useState<Record<string, boolean>>(
     Object.fromEntries(PIVOT_DATA.map((c) => [c.key, true]))
   );
@@ -583,7 +809,9 @@ function PivotTable() {
   };
 
   return (
-    <table style={{ borderCollapse: 'collapse', fontFamily: FONT, width: '100%' }}>
+    <>
+      {TipEl}
+      <table style={{ borderCollapse: 'collapse', fontFamily: FONT, width: '100%' }}>
       <thead>
         <tr>
           {/* Project column header */}
@@ -621,7 +849,16 @@ function PivotTable() {
 
               {/* Child rows */}
               {isOpen && cat.children.map((child) => (
-                <tr key={child.label}>
+                <tr
+                  key={child.label}
+                  onMouseEnter={e => show(e, `${cat.label} — ${child.label}`, [
+                    { k: 'In Progress', v: String(child.inProgress) },
+                    { k: 'Completed', v: String(child.completed) },
+                    { k: 'Total', v: String(child.inProgress + child.completed) },
+                  ])}
+                  onMouseMove={move}
+                  onMouseLeave={hide}
+                >
                   <td style={childLabelCell}>{child.label}</td>
                   <td style={dataCell(false)}>{child.inProgress}</td>
                   <td style={dataCell(false)}>{child.completed}</td>
@@ -647,6 +884,7 @@ function PivotTable() {
         </tr>
       </tbody>
     </table>
+    </>
   );
 }
 

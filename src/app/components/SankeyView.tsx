@@ -35,6 +35,7 @@ const DISPLAY_MISSING_VALUE_AS = '–';
 const LABEL_DECIMALS = 1;
 const SHORT_NUMBER = true;
 const DATA_LABELS_AS_TOTAL_PCT = false;
+const LABEL_CORNERS = 4;
 
 // ─── Monochrome palette shades ───────────────────────────────────────────────
 // Different intensity shades of the base color for each level
@@ -189,7 +190,12 @@ const links: SankeyLink[] = [
 function getSankeyOption(): echarts.EChartsCoreOption {
   return {
     tooltip: {
-      trigger: 'item',
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: [8, 12],
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
+            trigger: 'item',
       triggerOn: 'mousemove',
       textStyle: {
         fontFamily: FONT,
@@ -215,6 +221,9 @@ function getSankeyOption(): echarts.EChartsCoreOption {
           fontWeight: LABEL_BOLD ? 700 : 400,
           fontSize: LABEL_TEXT_SIZE,
           color: LABEL_TEXT_COLOR,
+          backgroundColor: LABEL_BG_COLOR,
+          borderRadius: LABEL_CORNERS,
+          padding: [4, 6],
           formatter: (params: any) => {
             const val = params.value;
             return `{name|${params.name}}\n{count|${val} projects}`;
@@ -365,7 +374,7 @@ function StyleConfiguration() {
         <StyleTable
           rows={[
             ['Levels & links gap', String(LEVELS_LINKS_GAP)],
-            ['Color', COLOR],
+            ['Node color', COLOR],
             ['Color opacity', `${COLOR_OPACITY * 100}%`],
             ['Used palette', USED_PALETTE],
           ]}
@@ -405,26 +414,59 @@ function StyleConfiguration() {
           ]}
         />
 
-        {/* Labels */}
+        {/* Category labels */}
         <h4 className="font-semibold mb-2 mt-6" style={{ fontFamily: FONT }}>
-          Labels
+          Category labels
         </h4>
         <StyleTable
           rows={[
-            ['Category labels', CATEGORY_LABELS_ENABLED ? 'Enabled' : 'Disabled'],
-            ['Level labels', LEVEL_LABELS_ENABLED ? 'Enabled' : 'Disabled'],
-            ['Data labels', DATA_LABELS_ENABLED ? 'Enabled' : 'Disabled'],
+            ['Enabled', CATEGORY_LABELS_ENABLED ? 'Yes' : 'No'],
             ['Position', LABEL_POSITION],
             ['Background color', LABEL_BG_COLOR],
             ['Background opacity', `${LABEL_BG_OPACITY * 100}%`],
             ['Font family', LABEL_FONT_FAMILY],
-            ['Bold', LABEL_BOLD ? 'Enabled' : 'Disabled'],
-            ['Text color', LABEL_TEXT_COLOR],
-            ['Text size', String(LABEL_TEXT_SIZE)],
+            ['Bold', LABEL_BOLD ? 'Yes' : 'No'],
+            ['Color', LABEL_TEXT_COLOR],
+            ['Size', String(LABEL_TEXT_SIZE)],
+          ]}
+        />
+
+        {/* Level labels */}
+        <h4 className="font-semibold mb-2 mt-6" style={{ fontFamily: FONT }}>
+          Level labels
+        </h4>
+        <StyleTable
+          rows={[
+            ['Enabled', LEVEL_LABELS_ENABLED ? 'Yes' : 'No'],
+            ['Position', LABEL_POSITION],
+            ['Background color', LABEL_BG_COLOR],
+            ['Background opacity', `${LABEL_BG_OPACITY * 100}%`],
+            ['Font family', LABEL_FONT_FAMILY],
+            ['Bold', LABEL_BOLD ? 'Yes' : 'No'],
+            ['Color', LABEL_TEXT_COLOR],
+            ['Size', String(LABEL_TEXT_SIZE)],
+          ]}
+        />
+
+        {/* Data labels */}
+        <h4 className="font-semibold mb-2 mt-6" style={{ fontFamily: FONT }}>
+          Data labels
+        </h4>
+        <StyleTable
+          rows={[
+            ['Enabled', DATA_LABELS_ENABLED ? 'Yes' : 'No'],
+            ['Position', LABEL_POSITION],
+            ['Background color', LABEL_BG_COLOR],
+            ['Background opacity', `${LABEL_BG_OPACITY * 100}%`],
+            ['Font family', LABEL_FONT_FAMILY],
+            ['Bold', LABEL_BOLD ? 'Yes' : 'No'],
+            ['Color', LABEL_TEXT_COLOR],
+            ['Size', String(LABEL_TEXT_SIZE)],
+            ['Label corners', String(LABEL_CORNERS)],
             ['Display missing value as', DISPLAY_MISSING_VALUE_AS],
             ['Decimals', String(LABEL_DECIMALS)],
-            ['Short number', SHORT_NUMBER ? 'Enabled' : 'Disabled'],
-            ['Data labels as total %', DATA_LABELS_AS_TOTAL_PCT ? 'Enabled' : 'Disabled'],
+            ['Short number', SHORT_NUMBER ? 'Yes' : 'No'],
+            ['Data labels as total %', DATA_LABELS_AS_TOTAL_PCT ? 'Yes' : 'No'],
           ]}
         />
       </div>

@@ -1,5 +1,39 @@
 import React from 'react';
 import { Clipboard, Zap, ChevronDown } from 'lucide-react';
+const FONT = 'Plus Jakarta Sans, sans-serif';
+
+const TOOLTIP_STYLE: React.CSSProperties = {
+  position: 'fixed',
+  pointerEvents: 'none',
+  background: '#FFFFFF',
+  border: '1px solid #E5E7EB',
+  borderRadius: 8,
+  padding: '8px 12px',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+  fontFamily: FONT,
+  fontSize: 13,
+  color: '#374151',
+  zIndex: 9999,
+};
+
+interface TipState { visible: boolean; x: number; y: number; title: string; rows: {k:string;v:string}[]; }
+const HIDDEN_TIP: TipState = { visible: false, x: 0, y: 0, title: '', rows: [] };
+
+function useTip() {
+  const [tip, setTip] = React.useState<TipState>(HIDDEN_TIP);
+  const show = (e: React.MouseEvent, title: string, rows: {k:string;v:string}[]) =>
+    setTip({ visible: true, x: e.clientX + 14, y: e.clientY + 14, title, rows });
+  const move = (e: React.MouseEvent) =>
+    setTip(t => t.visible ? { ...t, x: e.clientX + 14, y: e.clientY + 14 } : t);
+  const hide = () => setTip(t => ({ ...t, visible: false }));
+  const TipEl = tip.visible ? (
+    <div style={{ ...TOOLTIP_STYLE, left: tip.x, top: tip.y }}>
+      {tip.title && <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>{tip.title}</div>}
+      {tip.rows.map(({k, v}, i) => <div key={i}>{k}: <strong>{v}</strong></div>)}
+    </div>
+  ) : null;
+  return { show, move, hide, TipEl };
+}
 
 // ─── Style constants (match right-panel tables) ────────────────────────────────
 const INDICATOR_COLOR  = '#0B3A67'; // monochrome base
@@ -15,6 +49,11 @@ const ATTR_PL = 12;  // padding-left
 
 const ATTR_BORDER_COLOR = '#E5E7EB';
 const ATTR_BORDER_WIDTH = 1;
+
+const ATTR_FONT      = 'Auto';
+const ATTR_BOLD      = false;
+const ATTR_COLOR     = '#374151';
+const ATTR_SIZE      = 14;
 
 const DECIMALS     = 1;
 const SHORT_NUMBER = true;
@@ -67,8 +106,10 @@ const listData = [
 ];
 
 export function ListView() {
+  const { show, move, hide, TipEl } = useTip();
   return (
     <div className="flex h-full">
+      {TipEl}
       {/* Left side - List (Fixed) */}
       <div className="w-2/3 p-8 overflow-auto">
         <div className="flex flex-col overflow-x-auto" style={{ gap: `${ITEM_GAP}px` }}>
@@ -76,6 +117,9 @@ export function ListView() {
             <div
               key={item.id}
               className="flex items-stretch bg-white"
+              onMouseEnter={e => show(e, item.title, item.attributes.map(a => ({ k: a.label, v: typeof a.value === 'number' ? fmt(a.value) : String(a.value) })))}
+              onMouseMove={move}
+              onMouseLeave={hide}
               style={{
                 borderRadius: `${ITEM_CORNERS}px`,
                 border: `1px solid ${ATTR_BORDER_COLOR}`,
@@ -248,6 +292,10 @@ export function ListView() {
         <div className="mb-8">
           <h4 className="font-semibold mb-2" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Attribute Default Styles</h4>
           <StyleTable rows={[
+            ['Font family',              ATTR_FONT],
+            ['Bold',                     ATTR_BOLD ? 'Yes' : 'No'],
+            ['Color',                    ATTR_COLOR],
+            ['Size',                     String(ATTR_SIZE)],
             ['Border style',             'Solid'],
             ['Border color',             ATTR_BORDER_COLOR],
             ['Border width',             String(ATTR_BORDER_WIDTH)],
