@@ -53,10 +53,10 @@ const PRG_PROGRESS_COLOR  = '#0B3A67';   // palette[0] — base color for progre
 
 // ── Gauge ──
 const GAU_VALUE_SIZE      = 20;
-const GAU_VALUE_COLOR     = '#4E4749';
+const GAU_VALUE_COLOR     = '#0F172A';
 const GAU_DL_COLOR        = '#0E293B';
 const GAU_DL_SIZE         = 12;
-const GAU_CMP_VAL_COLOR   = '#4E4749';
+const GAU_CMP_VAL_COLOR   = '#0F172A';
 const GAU_CMP_VAL_SIZE    = 18;
 // Threshold band colors
 const GAU_BANDS: [number, string][] = [
@@ -252,6 +252,7 @@ const visualRows = (thresholds = 'No'): SectionRow[] => [
   { label: 'Track opacity',     value: '100%'              },
   { label: 'Progress color',    value: DEF_PROGRESS_COLOR  },
   { label: 'Progress opacity',  value: '100%'              },
+  { label: 'Used palette',      value: 'Monochrome'        },
   { label: 'Thresholds',        value: thresholds          },
 ];
 
@@ -377,6 +378,7 @@ const sparklineSections: SectionDef[] = [
       { label: 'Track opacity',     value: '100%'              },
       { label: 'Progress color',    value: SPK_PROGRESS_COLOR  },
       { label: 'Progress opacity',  value: '100%'              },
+      { label: 'Used palette',      value: 'Monochrome'        },
       { label: 'Thresholds',        value: 'No'                },
     ],
   },
@@ -414,6 +416,7 @@ const progressSections: SectionDef[] = [
       { label: 'Track opacity',     value: '100%'              },
       { label: 'Progress color',    value: PRG_PROGRESS_COLOR  },
       { label: 'Progress opacity',  value: '100%'              },
+      { label: 'Used palette',      value: 'Monochrome'        },
       { label: 'Thresholds',        value: 'No'                },
     ],
   },
@@ -451,6 +454,7 @@ const gaugeSections: SectionDef[] = [
       { label: 'Track opacity',     value: '100%'              },
       { label: 'Progress color',    value: DEF_PROGRESS_COLOR  },
       { label: 'Progress opacity',  value: '100%'              },
+      { label: 'Used palette',      value: 'Monochrome'        },
       { label: 'Thresholds',        value: 'Yes'               },
     ],
   },

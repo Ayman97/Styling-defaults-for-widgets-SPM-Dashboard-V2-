@@ -18,14 +18,16 @@ const ALLOW_PAN_ZOOM  = true;
 const SHOW_ZOOM_CTRL  = true;
 const SHOW_FULLSCREEN = true;
 
-const LABEL_ON      = true;
-const LABEL_POS     = 'Below';
-const LABEL_BG      = '#FFFFFF';
-const LABEL_BG_OPC  = 90;
-const LABEL_FONT    = 'Auto';
-const LABEL_BOLD    = false;
-const LABEL_COLOR   = '#374151';
-const LABEL_SIZE    = 14;
+const LABEL_ON       = true;
+const LABEL_POS      = 'Below';
+const LABEL_BG       = '#FFFFFF';
+const LABEL_BG_OPC   = 90;
+const LABEL_FONT     = 'Auto';
+const LABEL_BOLD     = false;
+const LABEL_COLOR    = '#374151';
+const LABEL_SIZE     = 14;
+const LABEL_DECIMALS = 1;
+const LABEL_SHORT_NUM = true;
 
 // Monochromatic palette — low → high
 const FILL_COLORS = [
@@ -150,11 +152,16 @@ function getFilledOption(): echarts.EChartsCoreOption {
     backgroundColor: '#FFFFFF',
     animation: false,
     tooltip: {
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: [8, 12],
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
       formatter: (p: any) => {
         const v = p.data?.value;
         return `<span style="font-family:${FONT}"><b>${p.name}</b>${v != null ? `<br/>Budget: <b>${fmtVal(v)}</b>` : ''}</span>`;
       },
-      textStyle: { fontFamily: FONT },
+      textStyle: { fontFamily: FONT, fontSize: 13, color: '#374151' },
     },
     visualMap: {
       min:     MIN_VAL,
@@ -206,11 +213,16 @@ function getBubbleOption(): echarts.EChartsCoreOption {
     backgroundColor: '#FFFFFF',
     animation: false,
     tooltip: {
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: [8, 12],
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
       formatter: (p: any) => {
         const val = (p.data.value as number[])[2];
         return `<span style="font-family:${FONT}"><b>${p.name}</b><br/>Budget: <b>${fmtVal(val)}</b></span>`;
       },
-      textStyle: { fontFamily: FONT },
+      textStyle: { fontFamily: FONT, fontSize: 13, color: '#374151' },
     },
     // visualMap drives bubble color from value[2] using the monochromatic palette
     visualMap: {
@@ -567,19 +579,21 @@ function StylePanel({ variant }: { variant: Variant }) {
           <Section
             title="Filled Areas"
             rows={[
-              ['Area color',    AREA_COLOR],
-              ['Area opacity',  `${AREA_OPACITY}%`],
-              ['Used palette',  FILLED_PALETTE],
+              ['Area color',           AREA_COLOR],
+              ['Area opacity',         `${AREA_OPACITY}%`],
+              ['Used palette',         FILLED_PALETTE],
+              ['Customize each region', 'No'],
             ]}
           />
         ) : (
           <Section
             title="Bubbles"
             rows={[
-              ['Bubble size',    `${BUBBLE_MAX_SIZE}`],
-              ['Bubble color',   BUBBLE_COLOR],
-              ['Bubble opacity', `${BUBBLE_OPACITY}%`],
-              ['Used palette',   BUBBLE_PALETTE],
+              ['Bubble size',           `${BUBBLE_MAX_SIZE}`],
+              ['Bubble color',          BUBBLE_COLOR],
+              ['Bubble opacity',        `${BUBBLE_OPACITY}%`],
+              ['Used palette',          BUBBLE_PALETTE],
+              ['Customize each series', 'No'],
             ]}
           />
         )}
@@ -594,15 +608,6 @@ function StylePanel({ variant }: { variant: Variant }) {
         </h3>
 
         <Section
-          title="Map Controls"
-          rows={[
-            ['Allow pan and zoom', ALLOW_PAN_ZOOM  ? 'Enabled' : 'Disabled'],
-            ['Show zoom control',  SHOW_ZOOM_CTRL  ? 'Enabled' : 'Disabled'],
-            ['Show full screen',   SHOW_FULLSCREEN ? 'Enabled' : 'Disabled'],
-          ]}
-        />
-
-        <Section
           title="Category Labels"
           rows={[
             ['Category labels',    LABEL_ON   ? 'Enabled' : 'Disabled'],
@@ -610,9 +615,30 @@ function StylePanel({ variant }: { variant: Variant }) {
             ['Background color',   LABEL_BG],
             ['Background opacity', `${LABEL_BG_OPC}%`],
             ['Font family',        LABEL_FONT],
-            ['Bold',               LABEL_BOLD ? 'Enabled' : 'Disabled'],
-            ['Text color',         LABEL_COLOR],
-            ['Text size',          `${LABEL_SIZE}`],
+            ['Bold',                  LABEL_BOLD ? 'Yes' : 'No'],
+            ['Color',                 LABEL_COLOR],
+            ['Size',                  `${LABEL_SIZE}`],
+            ['Display missing value as', '–'],
+            ['Decimals',              String(LABEL_DECIMALS)],
+            ['Short number',          LABEL_SHORT_NUM ? 'Yes' : 'No'],
+          ]}
+        />
+      </div>
+
+      <div className="mb-6">
+        <h3
+          className="text-sm font-semibold mb-4 px-3 py-2 rounded"
+          style={{ background: '#D1FAE5', color: '#065F46' }}
+        >
+          Behavior
+        </h3>
+
+        <Section
+          title="Map Controls"
+          rows={[
+            ['Allow pan / zoom',   ALLOW_PAN_ZOOM  ? 'Yes' : 'No'],
+            ['Show zoom control',  SHOW_ZOOM_CTRL  ? 'Yes' : 'No'],
+            ['Show full screen',   SHOW_FULLSCREEN ? 'Yes' : 'No'],
           ]}
         />
       </div>

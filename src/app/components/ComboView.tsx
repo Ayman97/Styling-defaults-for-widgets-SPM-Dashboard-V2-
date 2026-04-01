@@ -119,7 +119,12 @@ function getOption(variant: Variant, showRefLine: boolean): echarts.EChartsCoreO
     color: MONO_COLORS,
 
     tooltip: {
-      trigger: 'axis',
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: [8, 12],
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
+            trigger: 'axis',
       axisPointer: { type: 'shadow' },
       formatter(params: any) {
         let html = `<div style="font-family:${FONT};font-size:14px"><b>${params[0]?.axisValue}</b><br/>`;
@@ -313,7 +318,7 @@ function StyleTable({ rows }: { rows: [string, string][] }) {
 function Section({ title, rows }: { title: string; rows: [string, string][] }) {
   return (
     <div className="mb-5">
-      <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500 mb-2">{title}</h4>
+      <h4 className="text-xs font-semibold tracking-wide text-gray-500 mb-2">{title}</h4>
       <StyleTable rows={rows} />
     </div>
   );
@@ -346,8 +351,33 @@ function StylePanel({ variant, showRefLine, onToggleRefLine }: { variant: Varian
             ['Bar color',           BAR_COLOR_FIELD],
             ['Bar opacity',         `${BAR_OPACITY}%`],
             ['Used palette',        USED_PALETTE],
+            ['Customize each series', 'No'],
           ]}
         />
+
+        <div className="mb-5">
+          <h4 className="text-xs font-semibold tracking-wide text-gray-500 mb-2">Bars / Series customization default</h4>
+          <table className="w-full text-sm border-collapse" style={{ fontFamily: FONT }}>
+            <thead>
+              <tr style={{ background: '#B8D4E8' }}>
+                <th className="text-left p-2 border border-gray-300">Series</th>
+                <th className="text-left p-2 border border-gray-300">Color</th>
+                <th className="text-left p-2 border border-gray-300">Opacity</th>
+                <th className="text-left p-2 border border-gray-300">Corners</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2].map((n) => (
+                <tr key={n} style={{ background: '#fff' }}>
+                  <td className="p-2 border border-gray-300 text-gray-700">Series {n}</td>
+                  <td className="p-2 border border-gray-300 font-medium">{BAR_COLOR_FIELD}</td>
+                  <td className="p-2 border border-gray-300 font-medium">{BAR_OPACITY}%</td>
+                  <td className="p-2 border border-gray-300 font-medium">{CORNERS}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
         <Section
           title="Line"
@@ -363,8 +393,39 @@ function StylePanel({ variant, showRefLine, onToggleRefLine }: { variant: Varian
             ['Line style',       LINE_STYLE_VAL],
             ['Line color',       LINE_COLOR],
             ['Line width',       `${LINE_WIDTH}`],
+            ['Customize each line', 'No'],
           ]}
         />
+
+        <div className="mb-5">
+          <h4 className="text-xs font-semibold tracking-wide text-gray-500 mb-2">Line / Line customization default</h4>
+          <table className="w-full text-sm border-collapse" style={{ fontFamily: FONT }}>
+            <thead>
+              <tr style={{ background: '#B8D4E8' }}>
+                <th className="text-left p-2 border border-gray-300">Line</th>
+                <th className="text-left p-2 border border-gray-300">Smooth</th>
+                <th className="text-left p-2 border border-gray-300">Stepped</th>
+                <th className="text-left p-2 border border-gray-300">Markers</th>
+                <th className="text-left p-2 border border-gray-300">Line style</th>
+                <th className="text-left p-2 border border-gray-300">Line color</th>
+                <th className="text-left p-2 border border-gray-300">Line width</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[1, 2].map((n) => (
+                <tr key={n} style={{ background: '#fff' }}>
+                  <td className="p-2 border border-gray-300 text-gray-700">Line {n}</td>
+                  <td className="p-2 border border-gray-300 font-medium">{SMOOTH ? 'Yes' : 'No'}</td>
+                  <td className="p-2 border border-gray-300 font-medium">{STEPPED_LINES ? 'Yes' : 'No'}</td>
+                  <td className="p-2 border border-gray-300 font-medium">{MARKERS ? 'Yes' : 'No'}</td>
+                  <td className="p-2 border border-gray-300 font-medium">{LINE_STYLE_VAL}</td>
+                  <td className="p-2 border border-gray-300 font-medium">{LINE_COLOR}</td>
+                  <td className="p-2 border border-gray-300 font-medium">{LINE_WIDTH}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* ── Advanced styles ───────────────────────────────────────────────── */}
@@ -377,7 +438,7 @@ function StylePanel({ variant, showRefLine, onToggleRefLine }: { variant: Varian
         </h3>
 
         <div className="flex items-center justify-between mb-2">
-          <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500">Reference line</h4>
+          <h4 className="text-xs font-semibold tracking-wide text-gray-500">Reference line</h4>
           <button
             onClick={onToggleRefLine}
             className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus:outline-none ${showRefLine ? 'bg-blue-600' : 'bg-gray-300'}`}
@@ -424,9 +485,9 @@ function StylePanel({ variant, showRefLine, onToggleRefLine }: { variant: Varian
             ['Show axis line',   Y_LINE   ? 'Yes' : 'No'],
             ['Show axis labels', Y_LABELS ? 'Yes' : 'No'],
             ['Font family',      Y_FONT],
-            ['Text bold',        Y_BOLD   ? 'Yes' : 'No'],
-            ['Text color',       Y_COLOR],
-            ['Text size',        `${Y_SIZE}`],
+            ['Bold',             Y_BOLD   ? 'Yes' : 'No'],
+            ['Color',            Y_COLOR],
+            ['Size',             `${Y_SIZE}`],
             ['Label rotation',   `${Y_ROTATE}°`],
           ]}
         />
@@ -438,9 +499,9 @@ function StylePanel({ variant, showRefLine, onToggleRefLine }: { variant: Varian
             ['Show axis line',   X_LINE   ? 'Yes' : 'No'],
             ['Show axis labels', X_LABELS ? 'Yes' : 'No'],
             ['Font family',      X_FONT],
-            ['Text bold',        X_BOLD   ? 'Yes' : 'No'],
-            ['Text color',       X_COLOR],
-            ['Text size',        `${X_SIZE}`],
+            ['Bold',             X_BOLD   ? 'Yes' : 'No'],
+            ['Color',            X_COLOR],
+            ['Size',             `${X_SIZE}`],
             ['Label rotation',   `${X_ROTATE}°`],
           ]}
         />
@@ -459,18 +520,19 @@ function StylePanel({ variant, showRefLine, onToggleRefLine }: { variant: Varian
         <Section
           title="Data labels"
           rows={[
-            ['Data labels enabled',    DL_ENABLED ? 'Yes' : 'No'],
+            ['Enabled',                DL_ENABLED ? 'Yes' : 'No'],
             ['Position',               dlPos],
             ['Background color',       DL_BG],
             ['Background opacity',     `${DL_BG_OPC}%`],
             ['Font family',            DL_FONT],
-            ['Text bold',              DL_BOLD    ? 'Yes' : 'No'],
-            ['Text color',             DL_COLOR],
-            ['Text size',              `${DL_SIZE}`],
+            ['Bold',                   DL_BOLD    ? 'Yes' : 'No'],
+            ['Color',                  DL_COLOR],
+            ['Size',                   `${DL_SIZE}`],
             ['Label corners',          `${DL_CORNERS}`],
             ['Display missing value as', DL_MISSING],
             ['Decimals',               `${DL_DECIMALS}`],
             ['Short number',           DL_SHORT   ? 'Yes' : 'No'],
+            ['Customize for each line', 'No'],
           ]}
         />
       </div>

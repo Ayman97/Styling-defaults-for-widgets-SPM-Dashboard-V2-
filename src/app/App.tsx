@@ -19,10 +19,11 @@ import { NetworkView } from './components/NetworkView';
 import { MetricView } from './components/MetricView';
 import { ComparisonTableView } from './components/ComparisonTableView';
 import { SummaryTableView } from './components/SummaryTableView';
+import { CardView } from './components/CardView';
 
 type TabKey =
   | 'line' | 'donut' | 'bar' | 'combo' | 'table' | 'list' | 'radar'
-  | 'timeline' | 'sankey' | 'scatter' | 'hierarchy' | 'network' | 'treemap'
+  | 'timeline' | 'card' | 'sankey' | 'scatter' | 'hierarchy' | 'network' | 'treemap'
   | 'heatmap' | 'ragmatrix' | 'map' | 'metric'
   | 'comparison-table' | 'summary-table';
 
@@ -38,6 +39,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'summary-table',    label: 'Summary Table'    },
   { key: 'list',             label: 'List'             },
   { key: 'timeline',         label: 'Timeline'         },
+  { key: 'card',             label: 'Card Grid'        },
   // ── Remaining — grouped by type ───────────────────────────────────────────
   { key: 'scatter',          label: 'Scatter'          },
   { key: 'treemap',          label: 'Treemap'          },
@@ -146,6 +148,7 @@ export default function App() {
         {activeTab === 'list'      && <ListView />}
         {activeTab === 'radar'     && <RadarView />}
         {activeTab === 'timeline'  && <TimelineView />}
+        {activeTab === 'card'      && <CardView />}
         {activeTab === 'sankey'    && <SankeyView />}
         {activeTab === 'scatter'   && <ScatterView />}
         {activeTab === 'hierarchy' && <HierarchyView />}

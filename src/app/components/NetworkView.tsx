@@ -6,14 +6,18 @@ const FONT = 'Plus Jakarta Sans, sans-serif';
 // ─── Style constants (extracted from style panel image) ───────────────────────
 
 // Basic styles — Node
-const NODE_SIZE     = 80;   // diameter (circle) — base/reference size
-const NODE_BG       = '#FFFFFF';
-const NODE_BG_OPC   = 100;
-const USED_PALETTE  = 'Monochrome';
-const NODE_FONT_FAM = 'Auto';
-const NODE_BOLD     = false;
-const TEXT_COLOR    = '#111827';
-const TEXT_SIZE     = 14;
+const NODE_SIZE        = 80;   // diameter (circle) — base/reference size
+const NODE_BG          = '#FFFFFF';
+const NODE_BG_OPC      = 100;
+const NODE_PALETTE     = 'Monochrome';
+const NODE_CORNERS     = 4;
+const NODE_FONT_FAM    = 'Auto';
+const NODE_BOLD        = false;
+const TEXT_COLOR       = '#111827';
+const TEXT_SIZE        = 14;
+const NODE_BORDER_STYLE = 'None';
+const NODE_BORDER_COLOR = '#E2E8F0';
+const NODE_BORDER_WIDTH = 1;
 
 // Advanced styles — Link
 const LINE_TYPE     = 'Straight';
@@ -77,7 +81,12 @@ function getOption(): echarts.EChartsCoreOption {
     backgroundColor: '#FAFAFA',
     animation: true,
     tooltip: {
-      trigger: 'item',
+      backgroundColor: '#FFFFFF',
+      borderColor: '#E5E7EB',
+      borderWidth: 1,
+      padding: [8, 12],
+      extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
+            trigger: 'item',
       formatter: (p: any) => {
         if (p.dataType !== 'node') return '';
         return `<div style="font-family:${FONT};font-size:14px;line-height:1.6">
@@ -106,8 +115,8 @@ function getOption(): echarts.EChartsCoreOption {
         itemStyle: {
           color: NODE_BG,
           opacity: NODE_BG_OPC / 100,
-          borderColor: '#D1D5DB',
-          borderWidth: 1.5,
+          borderColor: NODE_BORDER_COLOR,
+          borderWidth: NODE_BORDER_STYLE === 'None' ? 0 : NODE_BORDER_WIDTH,
         },
         label: {
           show: true,
@@ -260,11 +269,16 @@ export function NetworkView() {
               ['Size',               'Auto'],
               ['Background color',   NODE_BG],
               ['Background opacity', `${NODE_BG_OPC}%`],
-              ['Used palette',       USED_PALETTE],
+              ['Used palette',       NODE_PALETTE],
+              ['Corners',            String(NODE_CORNERS)],
               ['Font family',        NODE_FONT_FAM],
               ['Bold',               NODE_BOLD ? 'Yes' : 'No'],
-              ['Text color',         TEXT_COLOR],
-              ['Text size',          `${TEXT_SIZE}`],
+              ['Color',              TEXT_COLOR],
+              ['Size',               `${TEXT_SIZE}`],
+              ['Border style',       NODE_BORDER_STYLE],
+              ['Border color',       NODE_BORDER_COLOR],
+              ['Border width',       `${NODE_BORDER_WIDTH}`],
+              ['Customize each node type', 'No'],
             ]}
             note="Default fixed size when not based on a measure: 140"
           />

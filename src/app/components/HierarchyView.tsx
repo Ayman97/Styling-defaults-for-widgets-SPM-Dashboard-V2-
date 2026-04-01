@@ -17,6 +17,39 @@ import '@xyflow/react/dist/style.css';
 
 const FONT = 'Plus Jakarta Sans, sans-serif';
 
+const TOOLTIP_STYLE: React.CSSProperties = {
+  position: 'fixed',
+  pointerEvents: 'none',
+  background: '#FFFFFF',
+  border: '1px solid #E5E7EB',
+  borderRadius: 8,
+  padding: '8px 12px',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+  fontFamily: FONT,
+  fontSize: 13,
+  color: '#374151',
+  zIndex: 9999,
+};
+
+interface TipState { visible: boolean; x: number; y: number; title: string; rows: {k:string;v:string}[]; }
+const HIDDEN_TIP: TipState = { visible: false, x: 0, y: 0, title: '', rows: [] };
+
+function useTip() {
+  const [tip, setTip] = React.useState<TipState>(HIDDEN_TIP);
+  const show = (e: React.MouseEvent, title: string, rows: {k:string;v:string}[]) =>
+    setTip({ visible: true, x: e.clientX + 14, y: e.clientY + 14, title, rows });
+  const move = (e: React.MouseEvent) =>
+    setTip(t => t.visible ? { ...t, x: e.clientX + 14, y: e.clientY + 14 } : t);
+  const hide = () => setTip(t => ({ ...t, visible: false }));
+  const TipEl = tip.visible ? (
+    <div style={TOOLTIP_STYLE}>
+      {tip.title && <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>{tip.title}</div>}
+      {tip.rows.map(({k, v}, i) => <div key={i}>{k}: <strong>{v}</strong></div>)}
+    </div>
+  ) : null;
+  return { show, move, hide, TipEl };
+}
+
 // ─── Style constants extracted from style panel ───────────────────────────────
 
 // Basic styles > Node
@@ -24,11 +57,14 @@ const NODE_WIDTH       = 160;
 const NODE_HEIGHT      = 44;
 const NODE_BG_COLOR    = '#FFFFFF';
 const NODE_BG_OPACITY  = 1.0;
-const USED_PALETTE     = 'Monochrome';
+const NODE_PALETTE     = 'Monochrome';
 const NODE_FONT_FAMILY = 'Auto';
 const NODE_TEXT_BOLD   = true;
 const NODE_TEXT_COLOR  = '#111827';
 const NODE_TEXT_SIZE   = 14;
+const NODE_BORDER_STYLE = 'None';
+const NODE_BORDER_COLOR = '#E2E8F0';
+const NODE_BORDER_WIDTH = 1;
 const NODE_CORNERS     = 12;
 
 // Advanced styles > Link
@@ -189,8 +225,14 @@ function flattenTree(root: PositionedNode): { nodes: Node[]; edges: Edge[] } {
 
 // ─── Custom node component ─────────────────────────────────────────────────────
 function HierarchyNode({ data }: { data: { label: string } }) {
+  const { show, move, hide, TipEl } = useTip();
   return (
-    <div
+    <>
+      {TipEl}
+      <div
+        onMouseEnter={e => show(e, data.label, [{ k: 'Node', v: data.label }])}
+        onMouseMove={move}
+        onMouseLeave={hide}
       style={{
         width: NODE_WIDTH,
         height: NODE_HEIGHT,
@@ -229,6 +271,7 @@ function HierarchyNode({ data }: { data: { label: string } }) {
         style={{ opacity: 0, width: 1, height: 1, minWidth: 1, minHeight: 1, border: 'none', background: 'transparent' }}
       />
     </div>
+    </>
   );
 }
 
@@ -385,12 +428,16 @@ function StylePanel() {
             ['Height',             String(NODE_HEIGHT)],
             ['Background color',   NODE_BG_COLOR],
             ['Background opacity', `${NODE_BG_OPACITY * 100}%`],
-            ['Used palette',       USED_PALETTE],
+            ['Used palette',       NODE_PALETTE],
             ['Font family',        NODE_FONT_FAMILY],
-            ['Text bold',          NODE_TEXT_BOLD ? 'Enabled' : 'Disabled'],
-            ['Text color',         NODE_TEXT_COLOR],
-            ['Text size',          String(NODE_TEXT_SIZE)],
+            ['Bold',               NODE_TEXT_BOLD ? 'Yes' : 'No'],
+            ['Color',              NODE_TEXT_COLOR],
+            ['Size',               String(NODE_TEXT_SIZE)],
             ['Corners',            String(NODE_CORNERS)],
+            ['Border style',       NODE_BORDER_STYLE],
+            ['Border color',       NODE_BORDER_COLOR],
+            ['Border width',       String(NODE_BORDER_WIDTH)],
+            ['Customize each level', 'No'],
           ]}
         />
       </div>

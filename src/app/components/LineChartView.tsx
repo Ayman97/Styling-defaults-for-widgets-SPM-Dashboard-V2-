@@ -81,7 +81,46 @@ const DL_MISSING            = '–';
 const DL_DECIMALS           = 1;
 const DL_SHORT_NUM          = true;
 
+const REF_LINE_ENABLED      = false;
+const REF_SHOW_LABEL        = true;
+const REF_LABEL_POS         = 'Above';
+const REF_LABEL_FONT        = 'Auto';
+const REF_LABEL_BOLD        = false;
+const REF_LABEL_COLOR       = '#374151';
+const REF_LABEL_SIZE        = 12;
+const REF_LINE_STYLE        = 'Dashed';
+const REF_LINE_COLOR        = '#94A3B8';
+const REF_LINE_WIDTH        = 1;
+const REF_LABEL_BG_COLOR    = '#FFFFFF';
+const REF_LABEL_BG_OPACITY  = 0;
+const REF_LABEL_CORNERS     = 4;
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
+const TOOLTIP_STYLE = {
+  background: '#FFFFFF',
+  border: '1px solid #E5E7EB',
+  borderRadius: 8,
+  padding: '8px 12px',
+  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+  fontFamily: FONT,
+  fontSize: 13,
+  color: '#374151',
+};
+
+const LineTooltip = ({ active, payload, label }: any) => {
+  if (!active || !payload?.length) return null;
+  return (
+    <div style={TOOLTIP_STYLE}>
+      <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>{label}</div>
+      {payload.map((p: any, i: number) => (
+        <div key={i}>
+          {p.name ?? 'Value'}: <strong>{p.value}</strong>
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const chartData = [
   { month: 'Jan', value: 65.5 },
   { month: 'Feb', value: 78.2 },
@@ -175,9 +214,9 @@ const sharedAxesSections: StyleSection[] = [
       ['Show axis line',   Y_SHOW_LINE   ? 'Yes' : 'No'],
       ['Show axis labels', Y_SHOW_LABELS ? 'Yes' : 'No'],
       ['Font family',      Y_FONT_FAM],
-      ['Text bold',        Y_BOLD ? 'Yes' : 'No'],
-      ['Text color',       Y_COLOR],
-      ['Text size',        String(Y_SIZE)],
+      ['Bold',             Y_BOLD ? 'Yes' : 'No'],
+      ['Color',            Y_COLOR],
+      ['Size',             String(Y_SIZE)],
       ['Label rotation',   Y_ROTATION],
     ],
   },
@@ -189,9 +228,9 @@ const sharedAxesSections: StyleSection[] = [
       ['Show axis line',   X_SHOW_LINE   ? 'Yes' : 'No'],
       ['Show axis labels', X_SHOW_LABELS ? 'Yes' : 'No'],
       ['Font family',      X_FONT_FAM],
-      ['Text bold',        X_BOLD ? 'Yes' : 'No'],
-      ['Text color',       X_COLOR],
-      ['Text size',        String(X_SIZE)],
+      ['Bold',             X_BOLD ? 'Yes' : 'No'],
+      ['Color',            X_COLOR],
+      ['Size',             String(X_SIZE)],
       ['Label rotation',   X_ROTATION],
     ],
   },
@@ -207,6 +246,25 @@ const sharedAxesSections: StyleSection[] = [
     ],
   },
   {
+    title: 'Advanced styles – Reference line',
+    headerBg: '#E8E1F5',
+    rows: [
+      ['Enabled',                    REF_LINE_ENABLED     ? 'Yes' : 'No'],
+      ['Show label',                 REF_SHOW_LABEL       ? 'Yes' : 'No'],
+      ['Label position',             REF_LABEL_POS],
+      ['Label font family',          REF_LABEL_FONT],
+      ['Label bold',                 REF_LABEL_BOLD       ? 'Yes' : 'No'],
+      ['Label color',                REF_LABEL_COLOR],
+      ['Label size',                 String(REF_LABEL_SIZE)],
+      ['Line style',                 REF_LINE_STYLE],
+      ['Line color',                 REF_LINE_COLOR],
+      ['Line width',                 String(REF_LINE_WIDTH)],
+      ['Label background color',     REF_LABEL_BG_COLOR],
+      ['Label background opacity',   String(REF_LABEL_BG_OPACITY)],
+      ['Label corners',              String(REF_LABEL_CORNERS)],
+    ],
+  },
+  {
     title: 'Data labels',
     headerBg: '#F9FAFB',
     rows: [
@@ -215,9 +273,9 @@ const sharedAxesSections: StyleSection[] = [
       ['Background color',           DL_BG_COLOR],
       ['Background opacity',         DL_BG_OPACITY],
       ['Font family',                DL_FONT_FAM],
-      ['Text bold',                  DL_BOLD ? 'Yes' : 'No'],
-      ['Text color',                 DL_COLOR],
-      ['Text size',                  String(DL_SIZE)],
+      ['Bold',                       DL_BOLD ? 'Yes' : 'No'],
+      ['Color',                      DL_COLOR],
+      ['Size',                       String(DL_SIZE)],
       ['Label corners',              String(DL_CORNERS)],
       ['Display missing value as',   DL_MISSING],
       ['Decimals',                   String(DL_DECIMALS)],
@@ -233,9 +291,9 @@ const sharedAxesSections: StyleSection[] = [
       ['Background color',         DL_BG_COLOR],
       ['Background opacity',       DL_BG_OPACITY],
       ['Font family',              DL_FONT_FAM],
-      ['Text bold',                DL_BOLD ? 'Yes' : 'No'],
-      ['Text color',               DL_COLOR],
-      ['Text size',                String(DL_SIZE)],
+      ['Bold',                     DL_BOLD ? 'Yes' : 'No'],
+      ['Color',                    DL_COLOR],
+      ['Size',                     String(DL_SIZE)],
       ['Label corners',            String(DL_CORNERS)],
       ['Display missing value as', DL_MISSING],
       ['Decimals',                 String(DL_DECIMALS)],
@@ -336,7 +394,7 @@ function LineVariantChart() {
             tickLine={false}
             tick={{ fill: Y_COLOR, fontSize: Y_SIZE, fontFamily: FONT }}
           />
-          <Tooltip />
+          <Tooltip content={<LineTooltip />} />
           <Line
             type="linear"
             dataKey="value"
@@ -383,7 +441,7 @@ function AreaVariantChart() {
             tickLine={false}
             tick={{ fill: Y_COLOR, fontSize: Y_SIZE, fontFamily: FONT }}
           />
-          <Tooltip />
+          <Tooltip content={<LineTooltip />} />
           <Area
             type="linear"
             dataKey="value"
