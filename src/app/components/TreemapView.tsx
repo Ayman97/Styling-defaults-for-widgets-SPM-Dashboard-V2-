@@ -5,7 +5,7 @@ const FONT = 'Plus Jakarta Sans, sans-serif';
 
 // ─── Style constants ──────────────────────────────────────────────────────────
 const BORDER_COLOR    = '#ffffff';
-const LABEL_COLOR     = '#FFFFFF';
+const LABEL_COLOR     = 'Auto';
 const LABEL_FONT_SIZE = 12;
 const LABEL_BOLD      = false;          // image: Bold = No
 const LABEL_BG        = 'Transparent';
@@ -33,6 +33,28 @@ const MONO = [
   '#D6E8F5',
 ];
 
+// ─── Auto contrast text color ─────────────────────────────────────────────────
+function hexToRgb(hex: string): [number, number, number] {
+  return [
+    parseInt(hex.slice(1, 3), 16),
+    parseInt(hex.slice(3, 5), 16),
+    parseInt(hex.slice(5, 7), 16),
+  ];
+}
+
+function getRelativeLuminance(hex: string): number {
+  const [r, g, b] = hexToRgb(hex).map(c => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** Returns '#000000' for light backgrounds, '#FFFFFF' for dark backgrounds. */
+function autoTextColor(bgHex: string): string {
+  return getRelativeLuminance(bgHex) > 0.179 ? '#000000' : '#FFFFFF';
+}
+
 // ─── Formatter ────────────────────────────────────────────────────────────────
 function fmt(val: number): string {
   if (!SHORT_NUMBER) return `$${val.toFixed(DECIMALS)}M`;
@@ -58,6 +80,7 @@ const DATA_FLAT = CATS.map(c => ({
   name:      c.name,
   value:     c.value,
   itemStyle: { color: c.color },
+  label:     { color: autoTextColor(c.color) },
 }));
 
 // Sub-categories per parent (split ratios)
@@ -119,10 +142,12 @@ const SUBCATS: Record<string, { name: string; ratio: number }[]> = {
 const DATA_2L = CATS.map(cat => ({
   name:      cat.name,
   itemStyle: { color: cat.color },
+  label:     { color: autoTextColor(cat.color) },
   children:  (SUBCATS[cat.name] || []).map(sub => ({
     name:      sub.name,
     value:     parseFloat((cat.value * sub.ratio).toFixed(DECIMALS)),
     itemStyle: { color: cat.color }, // exact same shade — white gaps do the subdivision
+    label:     { color: autoTextColor(cat.color) },
   })),
 }));
 
@@ -154,7 +179,7 @@ function getCategoryOption(): echarts.EChartsCoreOption {
         align:         'left' as const,
         verticalAlign: 'top' as const,
         padding:       [8, 10] as [number, number],
-        color:         LABEL_COLOR,
+        color:         '#FFFFFF', // fallback; per-item auto contrast overrides this
         fontWeight:    LABEL_BOLD ? 700 : 400,
         fontSize:      LABEL_FONT_SIZE,
         fontFamily:    FONT,
@@ -209,7 +234,7 @@ function getSubCatOption(): echarts.EChartsCoreOption {
         align:         'left' as const,
         verticalAlign: 'top' as const,
         padding:       [6, 8] as [number, number],
-        color:         LABEL_COLOR,
+        color:         '#FFFFFF', // fallback; per-item auto contrast overrides this
         fontWeight:    LABEL_BOLD ? 700 : 400,
         fontSize:      LABEL_FONT_SIZE - 1,
         fontFamily:    FONT,
@@ -329,7 +354,7 @@ function StylePanel() {
           ['Background opacity', `${LABEL_BG_OPACITY}%`],
           ['Font family',        'Auto'],
           ['Bold',               LABEL_BOLD ? 'Yes' : 'No'],
-          ['Color',              LABEL_COLOR],
+          ['Color',              LABEL_COLOR], // 'Auto'
           ['Size',               String(LABEL_FONT_SIZE)],
         ]} />
         <h4 className="text-sm font-semibold mb-2 mt-3">Data labels</h4>
@@ -339,7 +364,7 @@ function StylePanel() {
           ['Background opacity',       `${LABEL_BG_OPACITY}%`],
           ['Font family',              'Auto'],
           ['Bold',                     LABEL_BOLD ? 'Yes' : 'No'],
-          ['Color',                    LABEL_COLOR],
+          ['Color',                    LABEL_COLOR], // 'Auto'
           ['Size',                     String(LABEL_FONT_SIZE)],
           ['Display missing value as', '–'],
           ['Decimals',                 String(DECIMALS)],
