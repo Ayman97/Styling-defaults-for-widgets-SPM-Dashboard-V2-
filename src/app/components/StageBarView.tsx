@@ -94,42 +94,55 @@ export function StageBarView() {
 function StageBarChart() {
   const { show, move, hide, TipEl } = useTip();
   const SEGMENT_HEIGHT = 58;
+  const VISIBLE_COUNT = 4;
+  const total = STAGE_NAMES.length;
+  const [startIdx, setStartIdx] = useState(0);
+
+  const showPrev = startIdx > 0;
+  const showNext = startIdx + VISIBLE_COUNT < total;
+  const visibleStages = STAGE_NAMES.slice(startIdx, startIdx + VISIBLE_COUNT);
+
+  const navBtnStyle: React.CSSProperties = {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    border: '1px solid #D1D5DB',
+    backgroundColor: '#FFFFFF',
+    color: '#111827',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    boxShadow: '0 1px 2px rgba(15, 23, 42, 0.05)',
+    cursor: 'pointer',
+  };
 
   return (
     <div style={{ width: '100%', maxWidth: 980 }}>
       {TipEl}
       <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        <button
-          type="button"
-          aria-label="Previous stage"
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 10,
-            border: '1px solid #D1D5DB',
-            backgroundColor: '#FFFFFF',
-            color: '#111827',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.05)',
-            cursor: 'default',
-          }}
-        >
-          ‹
-        </button>
+        {showPrev && (
+          <button
+            type="button"
+            aria-label="Previous stage"
+            onClick={() => setStartIdx(i => Math.max(0, i - VISIBLE_COUNT))}
+            style={navBtnStyle}
+          >
+            ‹
+          </button>
+        )}
 
-        <div style={{ display: 'flex', alignItems: 'stretch', flex: 1, minWidth: 0, gap: 3 }}>
-          {STAGE_NAMES.map((name, i) => {
+        <div style={{ display: 'flex', alignItems: 'stretch', flex: 1, minWidth: 0, gap: 1 }}>
+          {visibleStages.map((name, vi) => {
+            const i = startIdx + vi;
             const stg = PER_STAGE_DEFAULTS[i];
-            const isFirst = i === 0;
-            const isLast = i === STAGE_NAMES.length - 1;
+            const isFirst = vi === 0;
+            const isLast = vi === visibleStages.length - 1;
             const segmentPath = isFirst
               ? 'M 10 0 H 184 L 200 29 L 184 58 H 10 Q 0 58 0 48 V 10 Q 0 0 10 0 Z'
               : isLast
-                ? 'M 16 0 H 190 Q 200 0 200 10 V 48 Q 200 58 190 58 H 16 L 0 29 Z'
-                : 'M 16 0 H 184 L 200 29 L 184 58 H 16 L 0 29 Z';
+                ? 'M 0 0 L 16 29 L 0 58 H 190 Q 200 58 200 48 V 10 Q 200 0 190 0 Z'
+                : 'M 0 0 L 16 29 L 0 58 H 184 L 200 29 L 184 0 Z';
 
             return (
               <div
@@ -143,7 +156,6 @@ function StageBarChart() {
                   height: SEGMENT_HEIGHT,
                   cursor: 'default',
                   position: 'relative',
-                  overflow: 'hidden',
                 }}
               >
                 <svg
@@ -167,7 +179,7 @@ function StageBarChart() {
                     alignItems: 'center',
                     justifyContent: 'space-between',
                     gap: 12,
-                    paddingLeft: isFirst ? 16 : 20,
+                    paddingLeft: isFirst ? 16 : 28,
                     paddingRight: isLast ? 16 : 20,
                   }}
                 >
@@ -202,26 +214,16 @@ function StageBarChart() {
           })}
         </div>
 
-        <button
-          type="button"
-          aria-label="Next stage"
-          style={{
-            width: 36,
-            height: 36,
-            borderRadius: 10,
-            border: '1px solid #D1D5DB',
-            backgroundColor: '#FFFFFF',
-            color: '#111827',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-            boxShadow: '0 1px 2px rgba(15, 23, 42, 0.05)',
-            cursor: 'default',
-          }}
-        >
-          ›
-        </button>
+        {showNext && (
+          <button
+            type="button"
+            aria-label="Next stage"
+            onClick={() => setStartIdx(i => Math.min(total - VISIBLE_COUNT, i + VISIBLE_COUNT))}
+            style={navBtnStyle}
+          >
+            ›
+          </button>
+        )}
       </div>
     </div>
   );
