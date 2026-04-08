@@ -20,16 +20,17 @@ import { MetricView } from './components/MetricView';
 import { ComparisonTableView } from './components/ComparisonTableView';
 import { SummaryTableView } from './components/SummaryTableView';
 import { CardView } from './components/CardView';
+import { StageBarView } from './components/StageBarView';
 
 type TabKey =
   | 'line' | 'donut' | 'bar' | 'combo' | 'table' | 'list' | 'radar'
   | 'timeline' | 'card' | 'sankey' | 'scatter' | 'hierarchy' | 'network' | 'treemap'
   | 'heatmap' | 'ragmatrix' | 'map' | 'metric'
-  | 'comparison-table' | 'summary-table';
+  | 'comparison-table' | 'summary-table' | 'stagebar';
 
 const TABS: { key: TabKey; label: string }[] = [
   // ── Popover order (first 10) ──────────────────────────────────────────────
-  { key: 'metric',           label: 'Metric'           },
+  { key: 'metric',           label: 'Metric (aka: Value Card)' },
   { key: 'bar',              label: 'Bar Chart'        },
   { key: 'donut',            label: 'Donut Chart'      },
   { key: 'line',             label: 'Line Chart'       },
@@ -40,6 +41,7 @@ const TABS: { key: TabKey; label: string }[] = [
   { key: 'list',             label: 'List'             },
   { key: 'timeline',         label: 'Timeline'         },
   { key: 'card',             label: 'Card Grid'        },
+  { key: 'stagebar',         label: 'Stage Bar'        },
   // ── Remaining — grouped by type ───────────────────────────────────────────
   { key: 'scatter',          label: 'Scatter'          },
   { key: 'treemap',          label: 'Treemap'          },
@@ -160,6 +162,7 @@ export default function App() {
         {activeTab === 'metric'    && <MetricView />}
         {activeTab === 'comparison-table' && <ComparisonTableView />}
         {activeTab === 'summary-table'    && <SummaryTableView />}
+        {activeTab === 'stagebar'         && <StageBarView />}
       </div>
     </div>
   );

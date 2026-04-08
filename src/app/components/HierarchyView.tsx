@@ -55,6 +55,11 @@ function useTip() {
 // Basic styles > Node
 const NODE_WIDTH       = 160;
 const NODE_HEIGHT      = 44;
+
+// Node shadow (already applied in rendering)
+const NODE_SHADOW         = 'Small';    // None | Small | Large
+const NODE_SHADOW_COLOR   = '#000000';
+const NODE_SHADOW_OPACITY = '8%';
 const NODE_BG_COLOR    = '#FFFFFF';
 const NODE_BG_OPACITY  = 1.0;
 const NODE_PALETTE     = 'Monochrome';
@@ -438,6 +443,9 @@ function StylePanel() {
             ['Border color',       NODE_BORDER_COLOR],
             ['Border width',       String(NODE_BORDER_WIDTH)],
             ['Customize each level', 'No'],
+            ['Shadow',              NODE_SHADOW],
+            ['Shadow color',        NODE_SHADOW_COLOR],
+            ['Shadow color opacity', NODE_SHADOW_OPACITY],
           ]}
         />
       </div>

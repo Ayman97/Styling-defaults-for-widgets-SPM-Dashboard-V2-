@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Activity } from 'lucide-react';
 import { GaugeChart } from './GaugeChart';
 
 const FONT = 'Plus Jakarta Sans, sans-serif';
@@ -70,6 +71,20 @@ const GAU_MIN = 20;
 const GAU_MAX = 50;
 const GAU_THRESHOLDS = [20, 44, 47, 50]; // boundary labels
 
+// ── Icon (decorative icon shown on metric card) ──
+const DEF_ICON_COLOR    = '#44546F';   // consistent with HDR_ICON_COLOR in CardView
+const DEF_ICON_OPACITY  = '100%';
+const DEF_ICON_POSITION = 'Center left';
+
+// ── Widget container (Visual section) ──
+const DEF_WIDGET_BG_COLOR   = '#FFFFFF';
+const DEF_WIDGET_BG_OPACITY = '100%';
+const DEF_WIDGET_PT         = 8;
+const DEF_WIDGET_PR         = 12;
+const DEF_WIDGET_PB         = 8;
+const DEF_WIDGET_PL         = 12;
+const DEF_WIDGET_CORNERS    = 16;        // consistent with ITEM_CORNERS in List/Card
+
 // ─── Chart Components ─────────────────────────────────────────────────────────
 
 // Thick filled up arrow (wide head + solid stem)
@@ -80,42 +95,57 @@ const ThickUpArrow: React.FC<{ size?: number; color?: string }> = ({ size = 16, 
   </svg>
 );
 
-const DefaultMetric: React.FC = () => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: DEF_LABEL_VALUE_GAP + 'px' }}>
-    <div style={{ fontSize: DEF_LABEL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
-      Metric label
-    </div>
-    <div style={{ fontSize: SHARED_VALUE_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_VALUE_COLOR, fontFamily: FONT }}>
-      75%
-    </div>
-  </div>
+type IconPosition = 'center-left' | 'center-right';
+
+// Decorative icon — shown on the metric card when enabled (no background)
+const MetricIcon: React.FC = () => (
+  <Activity size={24} color={DEF_ICON_COLOR} strokeWidth={1.5} style={{ flexShrink: 0 }} />
 );
 
-const ComparisonMetric: React.FC = () => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
-    {/* Metric label — grey */}
-    <div style={{ fontSize: DEF_LABEL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
-      Metric label
-    </div>
-    {/* Row: main value | 24px gap | comparison block */}
-    <div style={{ display: 'flex', alignItems: 'center', gap: CMP_VALUE_GAP + 'px' }}>
+const DefaultMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition }> = ({ showIcon, iconPosition }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+    {showIcon && iconPosition === 'center-left' && <MetricIcon />}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: DEF_LABEL_VALUE_GAP + 'px' }}>
+      <div style={{ fontSize: DEF_LABEL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
+        Metric label
+      </div>
       <div style={{ fontSize: SHARED_VALUE_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_VALUE_COLOR, fontFamily: FONT }}>
         75%
       </div>
-      {/* Comparison block: label on top, value below */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <span style={{ fontSize: CMP_DL_SIZE + 'px', lineHeight: 1, color: CMP_LABEL_COLOR, fontFamily: FONT }}>
-          Comparison label
-        </span>
-        <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: CMP_VAL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: CMP_VAL_COLOR, fontFamily: FONT }}>
-          <ThickUpArrow /> 12%
-        </span>
-      </div>
     </div>
+    {showIcon && iconPosition === 'center-right' && <MetricIcon />}
   </div>
 );
 
-const SparklineMetric: React.FC = () => {
+const ComparisonMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition }> = ({ showIcon, iconPosition }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+    {showIcon && iconPosition === 'center-left' && <MetricIcon />}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+      {/* Metric label — grey */}
+      <div style={{ fontSize: DEF_LABEL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
+        Metric label
+      </div>
+      {/* Row: main value | 24px gap | comparison block */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: CMP_VALUE_GAP + 'px' }}>
+        <div style={{ fontSize: SHARED_VALUE_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_VALUE_COLOR, fontFamily: FONT }}>
+          75%
+        </div>
+        {/* Comparison block: label on top, value below */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <span style={{ fontSize: CMP_DL_SIZE + 'px', lineHeight: 1, color: CMP_LABEL_COLOR, fontFamily: FONT }}>
+            Comparison label
+          </span>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: CMP_VAL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: CMP_VAL_COLOR, fontFamily: FONT }}>
+            <ThickUpArrow /> 12%
+          </span>
+        </div>
+      </div>
+    </div>
+    {showIcon && iconPosition === 'center-right' && <MetricIcon />}
+  </div>
+);
+
+const SparklineMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition }> = ({ showIcon, iconPosition }) => {
   const points = [22, 38, 28, 50, 35, 55, 42, 60, 48, 65];
   const w = 90; const h = 44;
   const max = Math.max(...points); const min = Math.min(...points);
@@ -127,36 +157,40 @@ const SparklineMetric: React.FC = () => {
   }).join(' ');
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
-      {/* Metric label — grey */}
-      <div style={{ fontSize: DEF_LABEL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
-        Metric label
-      </div>
-      {/* Row: main value | 24px gap | [comparison label, comparison value, sparkline] */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: CMP_VALUE_GAP + 'px' }}>
-        <div style={{ fontSize: SHARED_VALUE_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_VALUE_COLOR, fontFamily: FONT }}>
-          75%
+    <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+      {showIcon && iconPosition === 'center-left' && <MetricIcon />}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+        {/* Metric label — grey */}
+        <div style={{ fontSize: DEF_LABEL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
+          Metric label
         </div>
-        {/* Comparison block: label → value → sparkline (top to bottom) */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          <span style={{ fontSize: SPK_DL_SIZE + 'px', lineHeight: 1, color: CMP_LABEL_COLOR, fontFamily: FONT }}>
-            Comparison label
-          </span>
-          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: CMP_VAL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: CMP_VAL_COLOR, fontFamily: FONT }}>
-            <ThickUpArrow /> 12%
-          </span>
-          {/* Sparkline below comparison value */}
-          <svg width={w} height={h} style={{ flexShrink: 0 }}>
-            <path d={d} fill="none" stroke={SPK_PROGRESS_COLOR} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-            <path d={`${d} L ${w} ${h} L 0 ${h} Z`} fill={SPK_TRACK_COLOR} opacity="0.35" />
-          </svg>
+        {/* Row: main value | 24px gap | [comparison label, comparison value, sparkline] */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: CMP_VALUE_GAP + 'px' }}>
+          <div style={{ fontSize: SHARED_VALUE_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_VALUE_COLOR, fontFamily: FONT }}>
+            75%
+          </div>
+          {/* Comparison block: label → value → sparkline (top to bottom) */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <span style={{ fontSize: SPK_DL_SIZE + 'px', lineHeight: 1, color: CMP_LABEL_COLOR, fontFamily: FONT }}>
+              Comparison label
+            </span>
+            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: CMP_VAL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: CMP_VAL_COLOR, fontFamily: FONT }}>
+              <ThickUpArrow /> 12%
+            </span>
+            {/* Sparkline below comparison value */}
+            <svg width={w} height={h} style={{ flexShrink: 0 }}>
+              <path d={d} fill="none" stroke={SPK_PROGRESS_COLOR} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d={`${d} L ${w} ${h} L 0 ${h} Z`} fill={SPK_TRACK_COLOR} opacity="0.35" />
+            </svg>
+          </div>
         </div>
       </div>
+      {showIcon && iconPosition === 'center-right' && <MetricIcon />}
     </div>
   );
 };
 
-const ProgressMetric: React.FC = () => {
+const ProgressMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition }> = ({ showIcon, iconPosition }) => {
   const pct = 75;
   const R = 65; const sw = 18;
   const circ = 2 * Math.PI * R;
@@ -164,28 +198,32 @@ const ProgressMetric: React.FC = () => {
   const sz = R * 2 + sw;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
-      <div style={{ fontSize: DEF_LABEL_SIZE + 'px', fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
-        Metric label
-      </div>
-      <div style={{ position: 'relative', width: sz + 'px', height: sz + 'px' }}>
-        <svg width={sz} height={sz} style={{ transform: 'rotate(-90deg)' }}>
-          <circle cx={sz / 2} cy={sz / 2} r={R} fill="none" stroke={PRG_TRACK_COLOR} strokeWidth={sw} strokeLinecap="round" />
-          <circle cx={sz / 2} cy={sz / 2} r={R} fill="none" stroke={PRG_PROGRESS_COLOR} strokeWidth={sw}
-            strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round" />
-        </svg>
-        <div style={{
-          position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
-          fontSize: PRG_VALUE_SIZE + 'px', fontWeight: 'bold', color: PRG_VALUE_COLOR, fontFamily: FONT,
-        }}>
-          {pct}%
+    <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+      {showIcon && iconPosition === 'center-left' && <MetricIcon />}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+        <div style={{ fontSize: DEF_LABEL_SIZE + 'px', fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
+          Metric label
+        </div>
+        <div style={{ position: 'relative', width: sz + 'px', height: sz + 'px' }}>
+          <svg width={sz} height={sz} style={{ transform: 'rotate(-90deg)' }}>
+            <circle cx={sz / 2} cy={sz / 2} r={R} fill="none" stroke={PRG_TRACK_COLOR} strokeWidth={sw} strokeLinecap="round" />
+            <circle cx={sz / 2} cy={sz / 2} r={R} fill="none" stroke={PRG_PROGRESS_COLOR} strokeWidth={sw}
+              strokeDasharray={circ} strokeDashoffset={offset} strokeLinecap="round" />
+          </svg>
+          <div style={{
+            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            fontSize: PRG_VALUE_SIZE + 'px', fontWeight: 'bold', color: PRG_VALUE_COLOR, fontFamily: FONT,
+          }}>
+            {pct}%
+          </div>
         </div>
       </div>
+      {showIcon && iconPosition === 'center-right' && <MetricIcon />}
     </div>
   );
 };
 
-// ── SVG Gauge matching reference design ──────────────────────────────────────
+// ── SVG Gauge
 // Replaced by the standalone GaugeChart component (GaugeChart.tsx)
 
 // ─── Config Panels ───────────────────────────────────────────────────
@@ -229,6 +267,7 @@ const StylePanel: React.FC<{ variant: string; sections: SectionDef[] }> = ({ var
 // ── Label section rows ──
 const labelRows = (paddingBottom = '4'): SectionRow[] => [
   { label: 'Enabled',            value: 'Yes'           },
+  { label: 'Label position',     value: 'Above value'   },
   { label: 'Width',              value: 'Auto'          },
   { label: 'Height',             value: 'Auto'          },
   { label: 'Background color',   value: 'Transparent'   },
@@ -246,14 +285,24 @@ const labelRows = (paddingBottom = '4'): SectionRow[] => [
 
 // ── Visual section rows ──
 const visualRows = (thresholds = 'No'): SectionRow[] => [
-  { label: 'Layout',            value: DEF_LAYOUT          },
-  { label: 'Label & value gap', value: DEF_LABEL_VALUE_GAP },
-  { label: 'Track color',       value: DEF_TRACK_COLOR     },
-  { label: 'Track opacity',     value: '100%'              },
-  { label: 'Progress color',    value: DEF_PROGRESS_COLOR  },
-  { label: 'Progress opacity',  value: '100%'              },
-  { label: 'Used palette',      value: 'Monochrome'        },
-  { label: 'Thresholds',        value: thresholds          },
+  { label: 'Layout',               value: DEF_LAYOUT              },
+  { label: 'Label & value gap',    value: DEF_LABEL_VALUE_GAP     },
+  { label: 'Icon color',           value: DEF_ICON_COLOR          },
+  { label: 'Icon color opacity',   value: DEF_ICON_OPACITY        },
+  { label: 'Icon position',        value: DEF_ICON_POSITION       },
+  { label: 'Track color',          value: DEF_TRACK_COLOR         },
+  { label: 'Track opacity',        value: '100%'                  },
+  { label: 'Progress color',       value: DEF_PROGRESS_COLOR      },
+  { label: 'Progress opacity',     value: '100%'                  },
+  { label: 'Used palette',         value: 'Monochrome'            },
+  { label: 'Thresholds',           value: thresholds              },
+  { label: 'Background color',     value: DEF_WIDGET_BG_COLOR     },
+  { label: 'Background opacity',   value: DEF_WIDGET_BG_OPACITY   },
+  { label: 'Padding top',          value: String(DEF_WIDGET_PT)   },
+  { label: 'Padding right',        value: String(DEF_WIDGET_PR)   },
+  { label: 'Padding bottom',       value: String(DEF_WIDGET_PB)   },
+  { label: 'Padding left',         value: String(DEF_WIDGET_PL)   },
+  { label: 'Corners',              value: String(DEF_WIDGET_CORNERS) },
 ];
 
 // ── Visual data labels rows — identical across all variants, only Enabled differs ──
@@ -372,14 +421,24 @@ const sparklineSections: SectionDef[] = [
   {
     title: 'Visual', headerBg: '#F4F0FA',
     rows: [
-      { label: 'Layout',            value: DEF_LAYOUT          },
-      { label: 'Label & value gap', value: DEF_LABEL_VALUE_GAP },
-      { label: 'Track color',       value: SPK_TRACK_COLOR     },
-      { label: 'Track opacity',     value: '100%'              },
-      { label: 'Progress color',    value: SPK_PROGRESS_COLOR  },
-      { label: 'Progress opacity',  value: '100%'              },
-      { label: 'Used palette',      value: 'Monochrome'        },
-      { label: 'Thresholds',        value: 'No'                },
+      { label: 'Layout',               value: DEF_LAYOUT              },
+      { label: 'Label & value gap',    value: DEF_LABEL_VALUE_GAP     },
+      { label: 'Icon color',           value: DEF_ICON_COLOR          },
+      { label: 'Icon color opacity',   value: DEF_ICON_OPACITY        },
+      { label: 'Icon position',        value: DEF_ICON_POSITION       },
+      { label: 'Track color',          value: SPK_TRACK_COLOR         },
+      { label: 'Track opacity',        value: '100%'                  },
+      { label: 'Progress color',       value: SPK_PROGRESS_COLOR      },
+      { label: 'Progress opacity',     value: '100%'                  },
+      { label: 'Used palette',         value: 'Monochrome'            },
+      { label: 'Thresholds',           value: 'No'                    },
+      { label: 'Background color',     value: DEF_WIDGET_BG_COLOR     },
+      { label: 'Background opacity',   value: DEF_WIDGET_BG_OPACITY   },
+      { label: 'Padding top',          value: String(DEF_WIDGET_PT)   },
+      { label: 'Padding right',        value: String(DEF_WIDGET_PR)   },
+      { label: 'Padding bottom',       value: String(DEF_WIDGET_PB)   },
+      { label: 'Padding left',         value: String(DEF_WIDGET_PL)   },
+      { label: 'Corners',              value: String(DEF_WIDGET_CORNERS) },
     ],
   },
   { title: 'Visual data labels', headerBg: '#F4F0FA', rows: visualDataLabelRows(false) },
@@ -410,14 +469,24 @@ const progressSections: SectionDef[] = [
   {
     title: 'Visual', headerBg: '#F4F0FA',
     rows: [
-      { label: 'Layout',            value: DEF_LAYOUT          },
-      { label: 'Label & value gap', value: DEF_LABEL_VALUE_GAP },
-      { label: 'Track color',       value: PRG_TRACK_COLOR     },
-      { label: 'Track opacity',     value: '100%'              },
-      { label: 'Progress color',    value: PRG_PROGRESS_COLOR  },
-      { label: 'Progress opacity',  value: '100%'              },
-      { label: 'Used palette',      value: 'Monochrome'        },
-      { label: 'Thresholds',        value: 'No'                },
+      { label: 'Layout',               value: DEF_LAYOUT              },
+      { label: 'Label & value gap',    value: DEF_LABEL_VALUE_GAP     },
+      { label: 'Icon color',           value: DEF_ICON_COLOR          },
+      { label: 'Icon color opacity',   value: DEF_ICON_OPACITY        },
+      { label: 'Icon position',        value: DEF_ICON_POSITION       },
+      { label: 'Track color',          value: PRG_TRACK_COLOR         },
+      { label: 'Track opacity',        value: '100%'                  },
+      { label: 'Progress color',       value: PRG_PROGRESS_COLOR      },
+      { label: 'Progress opacity',     value: '100%'                  },
+      { label: 'Used palette',         value: 'Monochrome'            },
+      { label: 'Thresholds',           value: 'No'                    },
+      { label: 'Background color',     value: DEF_WIDGET_BG_COLOR     },
+      { label: 'Background opacity',   value: DEF_WIDGET_BG_OPACITY   },
+      { label: 'Padding top',          value: String(DEF_WIDGET_PT)   },
+      { label: 'Padding right',        value: String(DEF_WIDGET_PR)   },
+      { label: 'Padding bottom',       value: String(DEF_WIDGET_PB)   },
+      { label: 'Padding left',         value: String(DEF_WIDGET_PL)   },
+      { label: 'Corners',              value: String(DEF_WIDGET_CORNERS) },
     ],
   },
   { title: 'Visual data labels', headerBg: '#F4F0FA', rows: visualDataLabelRows(false) },
@@ -448,14 +517,24 @@ const gaugeSections: SectionDef[] = [
   {
     title: 'Visual', headerBg: '#F4F0FA',
     rows: [
-      { label: 'Layout',            value: DEF_LAYOUT          },
-      { label: 'Label & value gap', value: DEF_LABEL_VALUE_GAP },
-      { label: 'Track color',       value: DEF_TRACK_COLOR     },
-      { label: 'Track opacity',     value: '100%'              },
-      { label: 'Progress color',    value: DEF_PROGRESS_COLOR  },
-      { label: 'Progress opacity',  value: '100%'              },
-      { label: 'Used palette',      value: 'Monochrome'        },
-      { label: 'Thresholds',        value: 'Yes'               },
+      { label: 'Layout',               value: DEF_LAYOUT              },
+      { label: 'Label & value gap',    value: DEF_LABEL_VALUE_GAP     },
+      { label: 'Icon color',           value: DEF_ICON_COLOR          },
+      { label: 'Icon color opacity',   value: DEF_ICON_OPACITY        },
+      { label: 'Icon position',        value: DEF_ICON_POSITION       },
+      { label: 'Track color',          value: DEF_TRACK_COLOR         },
+      { label: 'Track opacity',        value: '100%'                  },
+      { label: 'Progress color',       value: DEF_PROGRESS_COLOR      },
+      { label: 'Progress opacity',     value: '100%'                  },
+      { label: 'Used palette',         value: 'Monochrome'            },
+      { label: 'Thresholds',           value: 'Yes'                   },
+      { label: 'Background color',     value: DEF_WIDGET_BG_COLOR     },
+      { label: 'Background opacity',   value: DEF_WIDGET_BG_OPACITY   },
+      { label: 'Padding top',          value: String(DEF_WIDGET_PT)   },
+      { label: 'Padding right',        value: String(DEF_WIDGET_PR)   },
+      { label: 'Padding bottom',       value: String(DEF_WIDGET_PB)   },
+      { label: 'Padding left',         value: String(DEF_WIDGET_PL)   },
+      { label: 'Corners',              value: String(DEF_WIDGET_CORNERS) },
     ],
   },
   {
@@ -482,6 +561,8 @@ const VARIANT_CONFIG: Record<MetricVariant, { label: string; sections: SectionDe
 // ─── Main Export ─────────────────────────────────────────────────────────────
 export const MetricView: React.FC = () => {
   const [activeVariant, setActiveVariant] = useState<MetricVariant>('default');
+  const [showIcon,       setShowIcon]      = useState(false);
+  const [iconPosition,   setIconPosition]  = useState<IconPosition>('center-left');
   const cfg = VARIANT_CONFIG[activeVariant];
 
   return (
@@ -514,35 +595,110 @@ export const MetricView: React.FC = () => {
 
       {/* Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left: Chart */}
-        <div className="flex-1 flex items-center justify-center p-8 bg-white">
-          {activeVariant === 'default'    && <DefaultMetric />}
-          {activeVariant === 'comparison' && <ComparisonMetric />}
-          {activeVariant === 'sparkline'  && <SparklineMetric />}
-          {activeVariant === 'progress'   && <ProgressMetric />}
-          {activeVariant === 'gauge'      && (
-            <div style={{
-              maxWidth: 520,
-              textAlign: 'center',
-              padding: '40px 32px',
-              color: '#6B7280',
-              fontFamily: 'Plus Jakarta Sans, sans-serif',
-              fontSize: 15,
-              lineHeight: 1.7,
-              border: '1px dashed #D1D5DB',
-              borderRadius: 12,
-              backgroundColor: '#F9FAFB',
-            }}>
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{ marginBottom: 16, opacity: 0.4 }}>
-                <path d="M8 36C8 22.7 15.2 12 24 12C32.8 12 40 22.7 40 36" stroke="#6B7280" strokeWidth="2.5" strokeLinecap="round"/>
-                <path d="M24 36L32 22" stroke="#6B7280" strokeWidth="2.5" strokeLinecap="round"/>
-                <circle cx="24" cy="36" r="2.5" fill="#6B7280"/>
-              </svg>
-              <p style={{ margin: 0, color: '#374151' }}>
-                Gauge isn't shown due to issues related to AI with design, Please use the same gauge meter design that we use in the system and see how it looks in different ways in dashboard v2 wireframes too
-              </p>
-            </div>
-          )}
+        {/* Left: Chart + icon toggle */}
+        <div className="flex-1 flex flex-col bg-white overflow-hidden">
+          {/* Icon visibility toggle — lives in the preview area, not the style panel */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '8px 24px',
+            borderBottom: '1px solid #E5E7EB',
+            backgroundColor: '#F9FAFB',
+            flexShrink: 0,
+          }}>
+            <span style={{ fontSize: '13px', color: '#374151', fontFamily: FONT, userSelect: 'none' }}>
+              Show icon
+            </span>
+            <button
+              onClick={() => setShowIcon(v => !v)}
+              aria-label="Toggle icon visibility"
+              style={{
+                width: 36,
+                height: 20,
+                borderRadius: 10,
+                backgroundColor: showIcon ? '#0B3A67' : '#D1D5DB',
+                border: 'none',
+                cursor: 'pointer',
+                position: 'relative',
+                padding: 0,
+                transition: 'background-color 0.2s',
+                flexShrink: 0,
+              }}
+            >
+              <div style={{
+                position: 'absolute',
+                top: 2,
+                left: showIcon ? 18 : 2,
+                width: 16,
+                height: 16,
+                borderRadius: '50%',
+                backgroundColor: '#FFFFFF',
+                transition: 'left 0.2s',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+              }} />
+            </button>
+            {/* Icon position control — only visible when icon is shown */}
+            {showIcon && (
+              <>
+                <div style={{ width: 1, height: 16, backgroundColor: '#D1D5DB', flexShrink: 0 }} />
+                <span style={{ fontSize: '13px', color: '#374151', fontFamily: FONT, userSelect: 'none' }}>
+                  Icon position
+                </span>
+                <div style={{ display: 'flex', border: '1px solid #D1D5DB', borderRadius: '6px', overflow: 'hidden' }}>
+                  {(['center-left', 'center-right'] as const).map((pos, i) => (
+                    <button
+                      key={pos}
+                      onClick={() => setIconPosition(pos)}
+                      style={{
+                        padding: '3px 10px',
+                        fontSize: '12px',
+                        fontFamily: FONT,
+                        border: 'none',
+                        borderLeft: i > 0 ? '1px solid #D1D5DB' : 'none',
+                        cursor: 'pointer',
+                        backgroundColor: iconPosition === pos ? '#0B3A67' : 'transparent',
+                        color: iconPosition === pos ? '#FFFFFF' : '#374151',
+                        transition: 'all 0.15s',
+                      }}
+                    >
+                      {pos === 'center-left' ? 'Left' : 'Right'}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+          {/* Preview area */}
+          <div className="flex-1 flex items-center justify-center p-8">
+            {activeVariant === 'default'    && <DefaultMetric    showIcon={showIcon} iconPosition={iconPosition} />}
+            {activeVariant === 'comparison' && <ComparisonMetric showIcon={showIcon} iconPosition={iconPosition} />}
+            {activeVariant === 'sparkline'  && <SparklineMetric  showIcon={showIcon} iconPosition={iconPosition} />}
+            {activeVariant === 'progress'   && <ProgressMetric   showIcon={showIcon} iconPosition={iconPosition} />}
+            {activeVariant === 'gauge'      && (
+              <div style={{
+                maxWidth: 520,
+                textAlign: 'center',
+                padding: '40px 32px',
+                color: '#6B7280',
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontSize: 15,
+                lineHeight: 1.7,
+                border: '1px dashed #D1D5DB',
+                borderRadius: 12,
+                backgroundColor: '#F9FAFB',
+              }}>
+                <svg width="48" height="48" viewBox="0 0 48 48" fill="none" style={{ marginBottom: 16, opacity: 0.4 }}>
+                  <path d="M8 36C8 22.7 15.2 12 24 12C32.8 12 40 22.7 40 36" stroke="#6B7280" strokeWidth="2.5" strokeLinecap="round"/>
+                  <path d="M24 36L32 22" stroke="#6B7280" strokeWidth="2.5" strokeLinecap="round"/>
+                  <circle cx="24" cy="36" r="2.5" fill="#6B7280"/>
+                </svg>
+                <p style={{ margin: 0, color: '#374151' }}>
+                  Gauge isn't shown due to issues related to AI with design, Please use the same gauge meter design that we use in the system and see how it looks in different ways in dashboard v2 wireframes too
+                </p>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Right: Style Panel */}
