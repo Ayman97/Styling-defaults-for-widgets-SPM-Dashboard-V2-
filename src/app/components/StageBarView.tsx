@@ -132,7 +132,7 @@ function StageBarChart() {
           </button>
         )}
 
-        <div style={{ display: 'flex', alignItems: 'stretch', flex: 1, minWidth: 0, gap: 1 }}>
+        <div style={{ display: 'flex', alignItems: 'stretch', flex: 1, minWidth: 0, gap: 0 }}>
           {visibleStages.map((name, vi) => {
             const i = startIdx + vi;
             const stg = PER_STAGE_DEFAULTS[i];

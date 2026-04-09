@@ -63,7 +63,7 @@ const CustomLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value, index 
 export function DonutChartView() {
   const [subTab, setSubTab] = useState<'donut' | 'pie'>('donut');
   
-  const innerRadius = subTab === 'donut' ? '40%' : '0%';
+  const innerRadius = subTab === 'donut' ? '30%' : '0%';
   const sliceCorners = subTab === 'donut' ? 8 : 4;
   const showCenterValue = subTab === 'donut';
 
@@ -163,7 +163,7 @@ export function DonutChartView() {
                 </tr>
               </thead>
               <tbody>
-                <tr><td className="p-2 border border-gray-300">Inner radius</td><td className="p-2 border border-gray-300"><Val v={subTab === 'donut' ? '40%' : '0%'} /></td></tr>
+                <tr><td className="p-2 border border-gray-300">Inner radius</td><td className="p-2 border border-gray-300"><Val v={subTab === 'donut' ? '30%' : '0%'} /></td></tr>
                 <tr><td className="p-2 border border-gray-300">Slice spacing</td><td className="p-2 border border-gray-300"><Val v="2" /></td></tr>
                 <tr><td className="p-2 border border-gray-300">Slice corners</td><td className="p-2 border border-gray-300"><Val v={String(sliceCorners)} /></td></tr>
                 <tr><td className="p-2 border border-gray-300">Slice color</td><td className="p-2 border border-gray-300"><Val v="#0B3A67" /></td></tr>

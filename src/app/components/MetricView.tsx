@@ -95,16 +95,65 @@ const ThickUpArrow: React.FC<{ size?: number; color?: string }> = ({ size = 16, 
   </svg>
 );
 
-type IconPosition = 'center-left' | 'center-right';
+type IconPosition =
+  | 'top-left' | 'top-center' | 'top-right'
+  | 'center-left' | 'center-right'
+  | 'bottom-left' | 'bottom-center' | 'bottom-right';
 
 // Decorative icon — shown on the metric card when enabled (no background)
 const MetricIcon: React.FC = () => (
   <Activity size={24} color={DEF_ICON_COLOR} strokeWidth={1.5} style={{ flexShrink: 0 }} />
 );
 
+// ── Icon position helpers ──
+const ICON_POSITION_GRID: (IconPosition | null)[][] = [
+  ['top-left',    'top-center',    'top-right'],
+  ['center-left',  null,           'center-right'],
+  ['bottom-left', 'bottom-center', 'bottom-right'],
+];
+
+const getIconJustify = (pos: IconPosition): string => {
+  if (pos.endsWith('-left'))   return 'flex-start';
+  if (pos.endsWith('-center')) return 'center';
+  return 'flex-end';
+};
+
+/** Wraps metric content and renders the icon at the chosen position */
+const MetricIconLayout: React.FC<{
+  showIcon: boolean;
+  iconPosition: IconPosition;
+  children: React.ReactNode;
+}> = ({ showIcon, iconPosition, children }) => {
+  if (!showIcon) return <>{children}</>;
+
+  const isTop    = iconPosition.startsWith('top');
+  const isCenter = iconPosition.startsWith('center');
+  const isBottom = iconPosition.startsWith('bottom');
+  const justify  = getIconJustify(iconPosition);
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'stretch' }}>
+      {isTop && (
+        <div style={{ display: 'flex', justifyContent: justify }}>
+          <MetricIcon />
+        </div>
+      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+        {isCenter && iconPosition === 'center-left' && <MetricIcon />}
+        {children}
+        {isCenter && iconPosition === 'center-right' && <MetricIcon />}
+      </div>
+      {isBottom && (
+        <div style={{ display: 'flex', justifyContent: justify }}>
+          <MetricIcon />
+        </div>
+      )}
+    </div>
+  );
+};
+
 const DefaultMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition }> = ({ showIcon, iconPosition }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-    {showIcon && iconPosition === 'center-left' && <MetricIcon />}
+  <MetricIconLayout showIcon={showIcon} iconPosition={iconPosition}>
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: DEF_LABEL_VALUE_GAP + 'px' }}>
       <div style={{ fontSize: DEF_LABEL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
         Metric label
@@ -113,13 +162,11 @@ const DefaultMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition }>
         75%
       </div>
     </div>
-    {showIcon && iconPosition === 'center-right' && <MetricIcon />}
-  </div>
+  </MetricIconLayout>
 );
 
 const ComparisonMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition }> = ({ showIcon, iconPosition }) => (
-  <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-    {showIcon && iconPosition === 'center-left' && <MetricIcon />}
+  <MetricIconLayout showIcon={showIcon} iconPosition={iconPosition}>
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
       {/* Metric label — grey */}
       <div style={{ fontSize: DEF_LABEL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
@@ -141,8 +188,7 @@ const ComparisonMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition
         </div>
       </div>
     </div>
-    {showIcon && iconPosition === 'center-right' && <MetricIcon />}
-  </div>
+  </MetricIconLayout>
 );
 
 const SparklineMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition }> = ({ showIcon, iconPosition }) => {
@@ -157,8 +203,7 @@ const SparklineMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition 
   }).join(' ');
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-      {showIcon && iconPosition === 'center-left' && <MetricIcon />}
+    <MetricIconLayout showIcon={showIcon} iconPosition={iconPosition}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
         {/* Metric label — grey */}
         <div style={{ fontSize: DEF_LABEL_SIZE + 'px', lineHeight: 1, fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
@@ -185,8 +230,7 @@ const SparklineMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition 
           </div>
         </div>
       </div>
-      {showIcon && iconPosition === 'center-right' && <MetricIcon />}
-    </div>
+    </MetricIconLayout>
   );
 };
 
@@ -198,8 +242,7 @@ const ProgressMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition }
   const sz = R * 2 + sw;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-      {showIcon && iconPosition === 'center-left' && <MetricIcon />}
+    <MetricIconLayout showIcon={showIcon} iconPosition={iconPosition}>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
         <div style={{ fontSize: DEF_LABEL_SIZE + 'px', fontWeight: 'bold', color: DEF_LABEL_COLOR, fontFamily: FONT }}>
           Metric label
@@ -218,8 +261,7 @@ const ProgressMetric: React.FC<{ showIcon: boolean; iconPosition: IconPosition }
           </div>
         </div>
       </div>
-      {showIcon && iconPosition === 'center-right' && <MetricIcon />}
-    </div>
+    </MetricIconLayout>
   );
 };
 
@@ -645,25 +687,37 @@ export const MetricView: React.FC = () => {
                 <span style={{ fontSize: '13px', color: '#374151', fontFamily: FONT, userSelect: 'none' }}>
                   Icon position
                 </span>
-                <div style={{ display: 'flex', border: '1px solid #D1D5DB', borderRadius: '6px', overflow: 'hidden' }}>
-                  {(['center-left', 'center-right'] as const).map((pos, i) => (
-                    <button
-                      key={pos}
-                      onClick={() => setIconPosition(pos)}
-                      style={{
-                        padding: '3px 10px',
-                        fontSize: '12px',
-                        fontFamily: FONT,
-                        border: 'none',
-                        borderLeft: i > 0 ? '1px solid #D1D5DB' : 'none',
-                        cursor: 'pointer',
-                        backgroundColor: iconPosition === pos ? '#0B3A67' : 'transparent',
-                        color: iconPosition === pos ? '#FFFFFF' : '#374151',
-                        transition: 'all 0.15s',
-                      }}
-                    >
-                      {pos === 'center-left' ? 'Left' : 'Right'}
-                    </button>
+                {/* 3×3 grid position picker */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(3, 16px)',
+                  gridTemplateRows: 'repeat(3, 16px)',
+                  gap: '3px',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '6px',
+                  padding: '4px',
+                  backgroundColor: '#FFFFFF',
+                }}>
+                  {ICON_POSITION_GRID.flat().map((pos, i) => (
+                    pos ? (
+                      <button
+                        key={pos}
+                        onClick={() => setIconPosition(pos)}
+                        title={pos.replace('-', ' ')}
+                        style={{
+                          width: 16,
+                          height: 16,
+                          borderRadius: '50%',
+                          border: iconPosition === pos ? '2px solid #0B3A67' : '2px solid #D1D5DB',
+                          backgroundColor: iconPosition === pos ? '#0B3A67' : 'transparent',
+                          cursor: 'pointer',
+                          padding: 0,
+                          transition: 'all 0.15s',
+                        }}
+                      />
+                    ) : (
+                      <div key={`empty-${i}`} style={{ width: 16, height: 16 }} />
+                    )
                   ))}
                 </div>
               </>
