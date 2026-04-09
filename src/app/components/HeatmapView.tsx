@@ -13,7 +13,7 @@ const SQUARE_OPACITY = 100;         // %
 const USED_PALETTE   = 'Monochrome';
 const LABEL_FONT     = 'Auto';
 const LABEL_BOLD     = false;       // disabled
-const LABEL_COLOR    = '#FFFFFF';
+const LABEL_COLOR    = 'Auto';
 const LABEL_SIZE     = 12;
 const BORDER_ON      = false;       // disabled
 const BORDER_STYLE   = 'Solid';
@@ -58,6 +58,48 @@ const DL_DECIMALS = 1;
 const DL_SHORT    = true;
 const DL_AS_PCT   = false;
 
+// ─── Auto contrast text color ─────────────────────────────────────────────────
+// Matches the visualMap inRange colors exactly (index 0 = lowest, 9 = highest)
+const HEATMAP_PALETTE = [
+  '#F5FAFE', '#EAF4FB', '#D6E8F5', '#B2D2EA', '#8FBBDC',
+  '#6CA3CF', '#4A88BC', '#2B6CA3', '#154E84', '#0B3A67',
+];
+
+function hexToRgb(hex: string): [number, number, number] {
+  return [
+    parseInt(hex.slice(1, 3), 16),
+    parseInt(hex.slice(3, 5), 16),
+    parseInt(hex.slice(5, 7), 16),
+  ];
+}
+
+/** Linearly interpolate between palette stops for a normalized t ∈ [0, 1]. */
+function interpolatePalette(palette: string[], t: number): string {
+  const idx   = t * (palette.length - 1);
+  const lo    = Math.floor(idx);
+  const hi    = Math.min(Math.ceil(idx), palette.length - 1);
+  const f     = idx - lo;
+  const [r1, g1, b1] = hexToRgb(palette[lo]);
+  const [r2, g2, b2] = hexToRgb(palette[hi]);
+  const r = Math.round(r1 + (r2 - r1) * f);
+  const g = Math.round(g1 + (g2 - g1) * f);
+  const b = Math.round(b1 + (b2 - b1) * f);
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+function getRelativeLuminance(hex: string): number {
+  const [r, g, b] = hexToRgb(hex).map(c => {
+    const s = c / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+}
+
+/** Returns '#000000' for light backgrounds, '#FFFFFF' for dark backgrounds. */
+function autoTextColor(bgHex: string): string {
+  return getRelativeLuminance(bgHex) > 0.179 ? '#000000' : '#FFFFFF';
+}
+
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const PORTFOLIOS = [
   'Digital Transformation',
@@ -95,13 +137,25 @@ const MATRIX: number[][] = [
   [387, 700, 387, 127, 100],
 ];
 
-const HEATMAP_DATA = MATRIX.flatMap((row, yi) =>
-  row.map((val, xi) => [xi, yi, val])
-);
-
 const ALL_VALS = MATRIX.flat();
 const MIN_VAL  = Math.min(...ALL_VALS);
 const MAX_VAL  = Math.max(...ALL_VALS);
+
+const HEATMAP_DATA = MATRIX.flatMap((row, yi) =>
+  row.map((val, xi) => {
+    const t       = (val - MIN_VAL) / (MAX_VAL - MIN_VAL);
+    const bgColor = interpolatePalette(HEATMAP_PALETTE, t);
+    const txtColor = autoTextColor(bgColor);
+    return {
+      value: [xi, yi, val] as [number, number, number],
+      label: {
+        color:           txtColor,
+        textBorderColor: txtColor === '#FFFFFF' ? 'rgba(0,0,0,0.25)' : 'transparent',
+        textBorderWidth: txtColor === '#FFFFFF' ? 1.5 : 0,
+      },
+    };
+  })
+);
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function fmtK(val: number): string {
@@ -147,8 +201,8 @@ function getOption(): echarts.EChartsCoreOption {
       borderWidth: 1,
       padding: [8, 12],
       extraCssText: 'border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.08);',
-            formatter: (p: any) => {
-        const [xi, yi, val] = p.data as [number, number, number];
+      formatter: (p: any) => {
+        const [xi, yi, val] = p.value as [number, number, number];
         return `<span style="font-family:${FONT}"><b>${REGIONS[yi]}</b><br/>${PORTFOLIOS[xi]}: <b>${fmtK(val)}</b></span>`;
       },
       textStyle: { fontFamily: FONT, fontSize: 14 },
@@ -256,17 +310,14 @@ function getOption(): echarts.EChartsCoreOption {
       type: 'heatmap',
       data: HEATMAP_DATA,
 
-      // Cell value label — always visible inside every cell
+      // Cell value label — color is set per-cell via HEATMAP_DATA for auto contrast
       label: {
         show:       true,
-        color:      LABEL_COLOR,
+        color:      '#FFFFFF', // fallback; per-item auto contrast overrides this
         fontSize:   LABEL_SIZE,
         fontWeight: LABEL_BOLD ? 700 : 400,
         fontFamily: FONT,
-        // Subtle shadow so white text stays legible on light cells
-        textBorderColor:  'rgba(0,0,0,0.25)',
-        textBorderWidth:  1.5,
-        formatter: (p: any) => fmtK((p.data as [number, number, number])[2]),
+        formatter: (p: any) => fmtK((p.value as [number, number, number])[2]),
       },
 
       // Cell appearance: rounded corners + white gaps via border
@@ -366,7 +417,7 @@ function StylePanel() {
             ['Used palette',   USED_PALETTE],
             ['Font family',    LABEL_FONT],
             ['Bold',           LABEL_BOLD ? 'Yes' : 'No'],
-            ['Color',          LABEL_COLOR],
+            ['Color',          LABEL_COLOR], // 'Auto'
             ['Size',           `${LABEL_SIZE}`],
             ['Border style',   BORDER_STYLE],
             ['Border color',   BORDER_COLOR],

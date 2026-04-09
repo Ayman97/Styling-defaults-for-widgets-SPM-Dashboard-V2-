@@ -58,6 +58,11 @@ const ATTR_SIZE      = 14;
 const DECIMALS     = 1;
 const SHORT_NUMBER = true;
 
+// Item shadow
+const ITEM_SHADOW         = 'Small';    // None | Small | Large
+const ITEM_SHADOW_COLOR   = '#000000';
+const ITEM_SHADOW_OPACITY = '8%';
+
 function fmt(val: number): string {
   if (!SHORT_NUMBER) return val.toFixed(DECIMALS);
   if (Math.abs(val) >= 1_000_000) return `${(val / 1_000_000).toFixed(DECIMALS)}M`;
@@ -126,6 +131,7 @@ export function ListView() {
                 overflow: 'hidden',
                 minHeight: '80px',
                 minWidth: 'fit-content',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.08)',
               }}
             >
               {/* Colored Indicator - Left */}
@@ -246,9 +252,12 @@ export function ListView() {
           <h3 className="text-lg font-semibold mb-3 bg-[#F5E6D3] px-3 py-2 rounded" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>Basic styles</h3>
           <h4 className="font-semibold mb-2" style={{ fontFamily: 'Plus Jakarta Sans, sans-serif' }}>List Items</h4>
           <StyleTable rows={[
-            ['Layout (default)', 'Horizontal'],
-            ['Gap between items', String(ITEM_GAP)],
-            ['Item corners',      String(ITEM_CORNERS)],
+            ['Layout (default)',    'Horizontal'],
+            ['Gap between items',   String(ITEM_GAP)],
+            ['Item corners',        String(ITEM_CORNERS)],
+            ['Shadow',              ITEM_SHADOW],
+            ['Shadow color',        ITEM_SHADOW_COLOR],
+            ['Shadow color opacity', ITEM_SHADOW_OPACITY],
           ]} />
         </div>
 

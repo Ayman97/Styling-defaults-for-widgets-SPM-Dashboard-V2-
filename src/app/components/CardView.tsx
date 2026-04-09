@@ -28,7 +28,7 @@ function useTip() {
     setTip(t => t.visible ? { ...t, x: e.clientX + 14, y: e.clientY + 14 } : t);
   const hide = () => setTip(t => ({ ...t, visible: false }));
   const TipEl = tip.visible ? (
-    <div style={TOOLTIP_STYLE}>
+    <div style={{ ...TOOLTIP_STYLE, left: tip.x, top: tip.y }}>
       {tip.title && <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>{tip.title}</div>}
       {tip.rows.map(({k, v}, i) => <div key={i}>{k}: <strong>{v}</strong></div>)}
     </div>
@@ -90,6 +90,11 @@ const ATTR_FONT  = 'Auto';
 const ATTR_BOLD  = false;
 const ATTR_COLOR = '#374151';
 const ATTR_SIZE  = 14;
+
+// Card shadow
+const ITEM_SHADOW         = 'Small';    // None | Small | Large
+const ITEM_SHADOW_COLOR   = '#000000';
+const ITEM_SHADOW_OPACITY = '8%';
 
 function fmt(val: number): string {
   if (!ATTR_SHORT_NUM) return val.toFixed(ATTR_DECIMALS);
@@ -211,6 +216,7 @@ function Card({ children }: { children: React.ReactNode }) {
         border:       `${ATTR_BORDER_WIDTH}px solid ${ATTR_BORDER_COLOR}`,
         overflow:     'hidden',
         background:   '#FFFFFF',
+        boxShadow:    '0 1px 4px rgba(0,0,0,0.08)',
       }}
     >
       {children}
@@ -343,9 +349,12 @@ export function CardView() {
           </h3>
           <h4 className="font-semibold mb-2" style={{ fontFamily: FONT }}>Card Items</h4>
           <StyleTable rows={[
-            ['Layout (default)', 'Horizontal'],
-            ['Gap between items', String(ITEM_GAP)],
-            ['Item corners',      String(ITEM_CORNERS)],
+            ['Layout (default)',    'Horizontal'],
+            ['Gap between items',   String(ITEM_GAP)],
+            ['Item corners',        String(ITEM_CORNERS)],
+            ['Shadow',              ITEM_SHADOW],
+            ['Shadow color',        ITEM_SHADOW_COLOR],
+            ['Shadow color opacity', ITEM_SHADOW_OPACITY],
           ]} />
         </div>
 
