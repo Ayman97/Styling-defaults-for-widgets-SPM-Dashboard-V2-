@@ -27,7 +27,7 @@ function useTip() {
     setTip(t => t.visible ? { ...t, x: e.clientX + 14, y: e.clientY + 14 } : t);
   const hide = () => setTip(t => ({ ...t, visible: false }));
   const TipEl = tip.visible ? (
-    <div style={TOOLTIP_STYLE}>
+    <div style={{ ...TOOLTIP_STYLE, left: tip.x, top: tip.y }}>
       {tip.title && <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>{tip.title}</div>}
       {tip.rows.map(({k, v}, i) => <div key={i}>{k}: <strong>{v}</strong></div>)}
     </div>
