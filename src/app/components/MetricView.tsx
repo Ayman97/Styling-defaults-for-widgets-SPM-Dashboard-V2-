@@ -378,7 +378,6 @@ const comparisonRows = (enabled: boolean): SectionRow[] => [
   { label: 'Value font family',         value: 'Auto'                  },
   { label: 'Value color',               value: DEF_CMP_VAL_COLOR       },
   { label: 'Value size',                value: String(DEF_CMP_VAL_SIZE) },
-  { label: 'Customize colors & shapes', value: 'No'                    },
   { label: 'Sparkline position',        value: 'Below comparison value' },
   { label: 'Display missing value as',  value: '–'                     },
   { label: 'Decimals',                  value: '1'                     },
