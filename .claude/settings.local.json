@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//private/tmp/**)",
+      "Bash(cp \"/Users/aymanalrifai/Documents/SPM_Widget_Styling_Evaluation_V2.numbers\" .)",
+      "Bash(unzip -o SPM_Widget_Styling_Evaluation_V2.numbers -d numbers_extracted)",
+      "Bash(python3 -c \"import numbers_parser\")",
+      "Bash(pip3 install:*)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(python3 -c \":*)",
+      "Bash(npx tsc:*)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(npm install:*)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(node -e \" const fs = require\\('fs'\\); const code = fs.readFileSync\\('/Applications/Claude.app/Contents/Resources/ion-dist/assets/v1/index-Tuy0550k.js', 'utf8'\\); const idx = code.indexOf\\('DownloadFailed'\\); console.log\\(code.substring\\(idx - 200, idx + 800\\)\\); \")",
+      "Bash(node:*)"
+    ]
+  }
+}
